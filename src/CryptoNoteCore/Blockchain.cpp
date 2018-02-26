@@ -507,6 +507,7 @@ bool Blockchain::init(const std::string& config_folder, bool load_existing) {
     timestamp_diff = time(NULL) - 1341378000;
   }
 
+  m_blocks.clear_cache();
   logger(INFO, BRIGHT_GREEN)
     << "Blockchain initialized. last block: " << m_blocks.size() - 1 << ", "
     << Common::timeIntervalToString(timestamp_diff)
@@ -557,6 +558,7 @@ void Blockchain::rebuildCache() {
     }
   }
 
+  m_blocks.clear_cache();
   std::chrono::duration<double> duration = std::chrono::steady_clock::now() - timePoint;
   logger(INFO, BRIGHT_WHITE) << "Rebuilding internal structures took: " << duration.count();
 }
@@ -1117,6 +1119,7 @@ bool Blockchain::handle_alternative_block(const Block& b, const Crypto::Hash& id
         << ENDL << " for alternative chain, have invalid timestamp: " << b.timestamp;
       //add_block_as_invalid(b, id);//do not add blocks to invalid storage before proof of work check was passed
       bvc.m_verifivation_failed = true;
+      m_blocks.clear_cache();
       return false;
     }
 
@@ -1129,6 +1132,7 @@ bool Blockchain::handle_alternative_block(const Block& b, const Crypto::Hash& id
       logger(ERROR, BRIGHT_RED) <<
         "CHECKPOINT VALIDATION FAILED";
       bvc.m_verifivation_failed = true;
+      m_blocks.clear_cache();
       return false;
     }
 
@@ -1143,6 +1147,7 @@ bool Blockchain::handle_alternative_block(const Block& b, const Crypto::Hash& id
         << ENDL << " for alternative chain, have not enough proof of work: " << proof_of_work
         << ENDL << " expected difficulty: " << current_diff;
       bvc.m_verifivation_failed = true;
+      m_blocks.clear_cache();
       return false;
     }
 
@@ -1150,6 +1155,7 @@ bool Blockchain::handle_alternative_block(const Block& b, const Crypto::Hash& id
       logger(INFO, BRIGHT_RED) <<
         "Block with id: " << Common::podToHex(id) << " (as alternative) have wrong miner transaction.";
       bvc.m_verifivation_failed = true;
+      m_blocks.clear_cache();
       return false;
     }
 
@@ -1180,6 +1186,7 @@ bool Blockchain::handle_alternative_block(const Block& b, const Crypto::Hash& id
       } else {
         bvc.m_verifivation_failed = true;
       }
+      m_blocks.clear_cache();
       return r;
     } else if (m_blocks.back().cumulative_difficulty < bei.cumulative_difficulty) //check if difficulty bigger then in main chain
     {
@@ -1194,6 +1201,7 @@ bool Blockchain::handle_alternative_block(const Block& b, const Crypto::Hash& id
       } else {
         bvc.m_verifivation_failed = true;
       }
+      m_blocks.clear_cache();
       return r;
     } else {
       logger(INFO, BRIGHT_BLUE) <<
@@ -1204,6 +1212,7 @@ bool Blockchain::handle_alternative_block(const Block& b, const Crypto::Hash& id
       if (sendNewAlternativeBlockMessage) {
         sendMessage(BlockchainMessage(NewAlternativeBlockMessage(id)));
       }
+      m_blocks.clear_cache();
       return true;
     }
   } else {
@@ -1213,6 +1222,7 @@ bool Blockchain::handle_alternative_block(const Block& b, const Crypto::Hash& id
       "Block recognized as orphaned and rejected, id = " << id;
   }
 
+  m_blocks.clear_cache();
   return true;
 }
 
@@ -1227,6 +1237,7 @@ bool Blockchain::getBlocks(uint32_t start_offset, uint32_t count, std::list<Bloc
     if (!(!missed_ids.size())) { logger(ERROR, BRIGHT_RED) << "have missed transactions in own block in main blockchain"; return false; }
   }
 
+  m_blocks.clear_cache();
   return true;
 }
 
@@ -1240,6 +1251,7 @@ bool Blockchain::getBlocks(uint32_t start_offset, uint32_t count, std::list<Bloc
     blocks.push_back(m_blocks[i].bl);
   }
 
+  m_blocks.clear_cache();
   return true;
 }
 
@@ -1388,6 +1400,7 @@ void Blockchain::print_blockchain(uint64_t start_index, uint64_t end_index) {
       << "\nid\t\t" << get_block_hash(m_blocks[i].bl)
       << "\ndifficulty\t\t" << blockDifficulty(i) << ", nonce " << m_blocks[i].bl.nonce << ", tx_count " << m_blocks[i].bl.transactionHashes.size() << ENDL;
   }
+  m_blocks.clear_cache();
   logger(DEBUGGING) <<
     "Current blockchain:" << ENDL << ss.str();
   logger(INFO, BRIGHT_WHITE) <<
@@ -1625,6 +1638,7 @@ bool Blockchain::check_tx_input(const KeyInput& txin, const Crypto::Hash& tx_pre
   static const Crypto::KeyImage L = { { 0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10 } };
   if (!(scalarmultKey(txin.keyImage, L) == I)) {
 	 logger(ERROR) << "Transaction uses key image not in the valid domain";
+   m_blocks.clear_cache();
 	 return false;
   }
 
@@ -1635,21 +1649,26 @@ bool Blockchain::check_tx_input(const KeyInput& txin, const Crypto::Hash& tx_pre
     logger(INFO, BRIGHT_WHITE) <<
       "Failed to get output keys for tx with amount = " << m_currency.formatAmount(txin.amount) <<
       " and count indexes " << txin.outputIndexes.size();
+    m_blocks.clear_cache();
     return false;
   }
 
   if (txin.outputIndexes.size() != output_keys.size()) {
     logger(INFO, BRIGHT_WHITE) <<
       "Output keys for tx with amount = " << txin.amount << " and count indexes " << txin.outputIndexes.size() << " returned wrong keys count " << output_keys.size();
+    m_blocks.clear_cache();
     return false;
   }
 
   if (!(sig.size() == output_keys.size())) { logger(ERROR, BRIGHT_RED) << "internal error: tx signatures count=" << sig.size() << " mismatch with outputs keys count for inputs=" << output_keys.size(); return false; }
   if (m_is_in_checkpoint_zone) {
+    m_blocks.clear_cache();
     return true;
   }
 
-  return Crypto::check_ring_signature(tx_prefix_hash, txin.keyImage, output_keys, sig.data());
+  bool ret = Crypto::check_ring_signature(tx_prefix_hash, txin.keyImage, output_keys, sig.data());
+  m_blocks.clear_cache();
+  return ret;
 }
 
 uint64_t Blockchain::get_adjusted_time() {
@@ -1670,6 +1689,7 @@ bool Blockchain::check_block_timestamp_main(const Block& b) {
     timestamps.push_back(m_blocks[offset].bl.timestamp);
   }
 
+  m_blocks.clear_cache();
   return check_block_timestamp(std::move(timestamps), b);
 }
 
@@ -2457,6 +2477,7 @@ bool Blockchain::loadBlockchainIndices() {
     std::chrono::duration<double> duration = std::chrono::steady_clock::now() - timePoint;
     logger(INFO, BRIGHT_WHITE) << "Rebuilding blockchain indices took: " << duration.count();
   }
+  m_blocks.clear_cache();
   return true;
 }
 
