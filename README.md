@@ -2,6 +2,19 @@
 
 The Niobio Cash is the Brazilian national cryptocurrency, just like Bitcoin but more anonymous and privacy centric with opaque and more analysis resistant blockchain. It is people's electronic cash, not connected to government or officials.
 
+##Installation
+```bash
+$ apt-get update
+$ apt-get upgrade
+$ apt-get install qtbase5-dev libssl-dev cmake git libboost1.58-all-dev build-essential g++
+$ git clone https://github.com/cryptoluka/cryptoluka
+$ cd cryptoluka/
+$ cmake CMakeLists.txt
+$ make install -j 2
+$ cd cryptonote/
+$ make install -j 2
+```
+
 ## Binaries
 
 You can download the binaries for Linux, MacOS, and Windows [HERE](https://github.com/niobio-cash/Downloads)
