@@ -57,6 +57,7 @@ namespace
   const command_line::arg_descriptor<bool>        arg_os_version  = {"os-version", ""};
   const command_line::arg_descriptor<std::string> arg_log_file    = {"log-file", "", ""};
   const command_line::arg_descriptor<int>         arg_log_level   = {"log-level", "", 2}; // info level
+  const command_line::arg_descriptor<int>         arg_cache_size  = {"cache-size", "Number of blocks to keep in cache. Default is 2048", 2048}; // info level
   const command_line::arg_descriptor<bool>        arg_console     = {"no-console", "Disable daemon console commands"};
   const command_line::arg_descriptor<bool>        arg_restricted_rpc = {"restricted-rpc", "Restrict RPC to view only commands to prevent abuse"};
   const command_line::arg_descriptor<bool>        arg_enable_blockchain_indexes = { "enable-blockchain-indexes", "Enable blockchain indexes", false };
@@ -120,6 +121,7 @@ int main(int argc, char* argv[])
 
     command_line::add_arg(desc_cmd_sett, arg_log_file);
     command_line::add_arg(desc_cmd_sett, arg_log_level);
+    command_line::add_arg(desc_cmd_sett, arg_cache_size);
     command_line::add_arg(desc_cmd_sett, arg_console);
 	command_line::add_arg(desc_cmd_sett, arg_restricted_rpc);
     command_line::add_arg(desc_cmd_sett, arg_testnet_on);
@@ -211,7 +213,7 @@ int main(int argc, char* argv[])
       return 1;
     }
     CryptoNote::Currency currency = currencyBuilder.currency();
-    CryptoNote::core ccore(currency, nullptr, logManager, command_line::get_arg(vm, arg_enable_blockchain_indexes));
+    CryptoNote::core ccore(currency, nullptr, logManager, command_line::get_arg(vm, arg_enable_blockchain_indexes), command_line::get_arg(vm,arg_cache_size));
 
     CryptoNote::Checkpoints checkpoints(logManager);
     for (const auto& cp : CryptoNote::CHECKPOINTS) {

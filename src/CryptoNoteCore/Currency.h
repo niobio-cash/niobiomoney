@@ -43,6 +43,7 @@ public:
 
   size_t timestampCheckWindow() const { return m_timestampCheckWindow; }
   uint64_t blockFutureTimeLimit() const { return m_blockFutureTimeLimit; }
+  uint64_t blockFutureTimeLimitV4() const { return m_blockFutureTimeLimitV4; }
 
   uint64_t moneySupply() const { return m_moneySupply; }
   unsigned int emissionSpeedFactor() const { return m_emissionSpeedFactor; }
@@ -65,7 +66,7 @@ public:
   size_t difficultyCut() const { return m_difficultyCut; }
   size_t difficultyBlocksCount() const { return m_difficultyWindow + m_difficultyLag; }
   size_t difficultyBlocksCount2() const { return CryptoNote::parameters::DIFFICULTY_WINDOW_V2; }
-
+  size_t difficultyBlocksCount4() const { return CryptoNote::parameters::DIFFICULTY_WINDOW_V4; }
   size_t maxBlockSizeInitial() const { return m_maxBlockSizeInitial; }
   uint64_t maxBlockSizeGrowthSpeedNumerator() const { return m_maxBlockSizeGrowthSpeedNumerator; }
   uint64_t maxBlockSizeGrowthSpeedDenominator() const { return m_maxBlockSizeGrowthSpeedDenominator; }
@@ -93,7 +94,8 @@ public:
   const std::string& blocksCacheFileName() const { return m_blocksCacheFileName; }
   const std::string& blockIndexesFileName() const { return m_blockIndexesFileName; }
   const std::string& txPoolFileName() const { return m_txPoolFileName; }
-  const std::string& blockchinIndicesFileName() const { return m_blockchinIndicesFileName; }
+  const std::string& blockchainIndicesFileName() const { return m_blockchainIndicesFileName; }
+  const std::string& testnetFilenamePrefix() const { return m_testnetFilenamePrefix; }
 
   bool isTestnet() const { return m_testnet; }
 
@@ -122,7 +124,9 @@ public:
   bool parseAmount(const std::string& str, uint64_t& amount) const;
 
   difficulty_type nextDifficulty(uint8_t blockMajorVersion, std::vector<uint64_t> timestamps, std::vector<difficulty_type> Difficulties) const;
-
+  difficulty_type nextDifficultyV1(std::vector<uint64_t> timestamps, std::vector<difficulty_type> Difficulties) const;
+  difficulty_type nextDifficultyV2(std::vector<uint64_t> timestamps, std::vector<difficulty_type> Difficulties) const;
+  difficulty_type nextDifficultyV4(std::vector<uint64_t> timestamps, std::vector<difficulty_type> Difficulties) const;
   bool checkProofOfWorkV1(Crypto::cn_context& context, const Block& block, difficulty_type currentDiffic, Crypto::Hash& proofOfWork) const;
   bool checkProofOfWorkV2(Crypto::cn_context& context, const Block& block, difficulty_type currentDiffic, Crypto::Hash& proofOfWork) const;
   bool checkProofOfWork(Crypto::cn_context& context, const Block& block, difficulty_type currentDiffic, Crypto::Hash& proofOfWork) const;
@@ -146,6 +150,7 @@ private:
 
   size_t m_timestampCheckWindow;
   uint64_t m_blockFutureTimeLimit;
+  uint64_t m_blockFutureTimeLimitV4;
 
   uint64_t m_moneySupply;
   unsigned int m_emissionSpeedFactor;
@@ -183,6 +188,7 @@ private:
 
   uint32_t m_upgradeHeightV2;
   uint32_t m_upgradeHeightV3;
+  uint32_t m_upgradeHeightV4;
   unsigned int m_upgradeVotingThreshold;
   uint32_t m_upgradeVotingWindow;
   uint32_t m_upgradeWindow;
@@ -191,7 +197,8 @@ private:
   std::string m_blocksCacheFileName;
   std::string m_blockIndexesFileName;
   std::string m_txPoolFileName;
-  std::string m_blockchinIndicesFileName;
+  std::string m_blockchainIndicesFileName;
+  std::string m_testnetFilenamePrefix;
 
   static const std::vector<uint64_t> PRETTY_AMOUNTS;
 
@@ -225,6 +232,7 @@ public:
 
   CurrencyBuilder& timestampCheckWindow(size_t val) { m_currency.m_timestampCheckWindow = val; return *this; }
   CurrencyBuilder& blockFutureTimeLimit(uint64_t val) { m_currency.m_blockFutureTimeLimit = val; return *this; }
+  CurrencyBuilder& blockFutureTimeLimitV4(uint64_t val) { m_currency.m_blockFutureTimeLimitV4 = val; return *this; }
 
   CurrencyBuilder& moneySupply(uint64_t val) { m_currency.m_moneySupply = val; return *this; }
   CurrencyBuilder& emissionSpeedFactor(unsigned int val);
@@ -261,6 +269,7 @@ public:
 
   CurrencyBuilder& upgradeHeightV2(uint64_t val) { m_currency.m_upgradeHeightV2 = val; return *this; }
   CurrencyBuilder& upgradeHeightV3(uint64_t val) { m_currency.m_upgradeHeightV3 = val; return *this; }
+  CurrencyBuilder& upgradeHeightV4(uint64_t val) { m_currency.m_upgradeHeightV4 = val; return *this; }
   CurrencyBuilder& upgradeVotingThreshold(unsigned int val);
   CurrencyBuilder& upgradeVotingWindow(size_t val) { m_currency.m_upgradeVotingWindow = val; return *this; }
   CurrencyBuilder& upgradeWindow(size_t val);
@@ -269,8 +278,9 @@ public:
   CurrencyBuilder& blocksCacheFileName(const std::string& val) { m_currency.m_blocksCacheFileName = val; return *this; }
   CurrencyBuilder& blockIndexesFileName(const std::string& val) { m_currency.m_blockIndexesFileName = val; return *this; }
   CurrencyBuilder& txPoolFileName(const std::string& val) { m_currency.m_txPoolFileName = val; return *this; }
-  CurrencyBuilder& blockchinIndicesFileName(const std::string& val) { m_currency.m_blockchinIndicesFileName = val; return *this; }
-  
+  CurrencyBuilder& blockchainIndicesFileName(const std::string& val) { m_currency.m_blockchainIndicesFileName = val; return *this; }
+  CurrencyBuilder& testnetFilenamePrefix(const std::string& val) { m_currency.m_testnetFilenamePrefix = val; return *this; }
+
   CurrencyBuilder& testnet(bool val) { m_currency.m_testnet = val; return *this; }
 
 private:
