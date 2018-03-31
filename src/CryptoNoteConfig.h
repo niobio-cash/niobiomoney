@@ -23,12 +23,14 @@
 namespace CryptoNote {
 namespace parameters {
 
+const uint64_t DIFFICULTY_TARGET                             = 240; // seconds
 const uint64_t CRYPTONOTE_MAX_BLOCK_NUMBER                   = 500000000;
 const size_t   CRYPTONOTE_MAX_BLOCK_BLOB_SIZE                = 500000000;
 const size_t   CRYPTONOTE_MAX_TX_SIZE                        = 1000000000;
 const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX       = 126; // addresses start with "N"
 const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW          = 10;
 const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT            = 60 * 60 * 2;
+const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4         = DIFFICULTY_TARGET * 7;
 
 const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW             = 60;
 
@@ -49,11 +51,11 @@ const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 8;
 const uint64_t MINIMUM_FEE                                   = UINT64_C(1000);
 const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(1000);
 
-const uint64_t DIFFICULTY_TARGET                             = 240; // seconds
 const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY             = 24 * 60 * 60 / DIFFICULTY_TARGET;
 const size_t   DIFFICULTY_WINDOW                             = 36; //EXPECTED_NUMBER_OF_BLOCKS_PER_DAY; // blocks
 const size_t   DIFFICULTY_WINDOW_V2                          = 36; //17; // blocks
-const size_t   DIFFICULTY_CUT                                = 0; //60;  // timestamps to cut after sorting
+const size_t   DIFFICULTY_WINDOW_V4                          = 61; // blocks
+const size_t   DIFFICULTY_CUT                                = 0; // timestamps to cut after sorting
 const size_t   DIFFICULTY_LAG                                = 0; //15;  // !!!
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 
@@ -64,9 +66,9 @@ const uint64_t MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR       = 365 * 24 * 60 * 6
 const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS     = 1;
 const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS    = DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
 
-const uint64_t CRYPTONOTE_MEMPOOL_TX_LIVETIME                = 60 * 60 * 24;     //seconds, one day
-const uint64_t CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME = 60 * 60 * 24 * 1; // 7; //seconds, one week
-const uint64_t CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL = 1; // 7;  // CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL * CRYPTONOTE_MEMPOOL_TX_LIVETIME = time to forget tx
+const uint64_t CRYPTONOTE_MEMPOOL_TX_LIVETIME                = 60 * 60 * 24 * 2;     //seconds
+const uint64_t CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME = 60 * 60 * 24 * 1; // 7; //seconds
+const uint64_t CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL = 7; // 7;  // CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL * CRYPTONOTE_MEMPOOL_TX_LIVETIME = time to forget tx
 
 const size_t   FUSION_TX_MAX_SIZE                            = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_CURRENT * 30 / 100;
 const size_t   FUSION_TX_MIN_INPUT_COUNT                     = 12;
@@ -74,7 +76,8 @@ const size_t   FUSION_TX_MIN_IN_OUT_COUNT_RATIO              = 4;
 
 const uint32_t UPGRADE_HEIGHT_V2                             = 1;
 const uint32_t UPGRADE_HEIGHT_V3                             = 30;
-const unsigned UPGRADE_VOTING_THRESHOLD = 90;               // percent
+const uint32_t UPGRADE_HEIGHT_V4                             = -1;
+const unsigned UPGRADE_VOTING_THRESHOLD											 = 90;   // percent
 const uint32_t   UPGRADE_VOTING_WINDOW                       = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;  // blocks
 const uint32_t   UPGRADE_WINDOW                              = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;  // blocks
 static_assert(0 < UPGRADE_VOTING_THRESHOLD && UPGRADE_VOTING_THRESHOLD <= 100, "Bad UPGRADE_VOTING_THRESHOLD");
@@ -87,6 +90,7 @@ const char     CRYPTONOTE_POOLDATA_FILENAME[]                = "poolstate.bin";
 const char     P2P_NET_DATA_FILENAME[]                       = "p2pstate.bin";
 const char     CRYPTONOTE_BLOCKCHAIN_INDICES_FILENAME[]      = "blockchainindices.dat";
 const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json";
+const char     TESTNET_FILENAME_PREFIX[]                     = "testnet_";
 } // parameters
 
 const char     CRYPTONOTE_NAME[]                             = "niobio";
@@ -96,11 +100,12 @@ const uint8_t  CURRENT_TRANSACTION_VERSION                   =  1;
 const uint8_t  BLOCK_MAJOR_VERSION_1                         =  1;
 const uint8_t  BLOCK_MAJOR_VERSION_2                         =  2;
 const uint8_t  BLOCK_MAJOR_VERSION_3                         =  3;
+const uint8_t  BLOCK_MAJOR_VERSION_4                         =  4;
 const uint8_t  BLOCK_MINOR_VERSION_0                         =  0;
 const uint8_t  BLOCK_MINOR_VERSION_1                         =  1;
 
 const size_t   BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT        =  10000;  //by default, blocks ids count in synchronizing
-const size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT            =  128;    //by default, blocks count in blocks downloading
+const size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT            =  300;    //by default, blocks count in blocks downloading
 const size_t   COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT         =  1000;
 
 const int      P2P_DEFAULT_PORT                              =  8313;
@@ -110,7 +115,7 @@ const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  1000;
 const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
 
 const size_t   P2P_CONNECTION_MAX_WRITE_BUFFER_SIZE          = 64 * 1024 * 1024; // 64 MB
-const uint32_t P2P_DEFAULT_CONNECTIONS_COUNT                 = 15;
+const uint32_t P2P_DEFAULT_CONNECTIONS_COUNT                 = 10;
 const size_t   P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT     = 70;
 const uint32_t P2P_DEFAULT_HANDSHAKE_INTERVAL                = 60;            // seconds
 const uint32_t P2P_DEFAULT_PACKET_MAX_SIZE                   = 50000000;      // 50000000 bytes maximum packet size
@@ -122,6 +127,7 @@ const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT          = 5000;          //
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "";
 
 const char* const SEED_NODES[] = {
+	"remote-nbr-hydra.niobioco.in:8313",
 	"45.55.141.227:8313",
 	"138.197.222.188:8313",
 	"35.227.102.144:8313",
@@ -182,9 +188,10 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {
 	{ 41727, "4581bcd69a4924b0cd7c6c9f8e65817feaba3ae3ec984a4b1ede2c450b9eb31e" },
 	{ 46696, "7d0d9048be57c80d2c44fe67555b65d93449e088c0773ae630b6165f87562057" },
 	{ 47329, "dbe612e290285c5c5a80f496692be4a6e49c09abee1f50455563ad0a256e748b" },
-	{ 47330, "924feb71a2c589718e8c8a922d9cf5e3ad3163441e4c975bbf41e413481342c2" }
-
-
+	{ 47330, "924feb71a2c589718e8c8a922d9cf5e3ad3163441e4c975bbf41e413481342c2" },
+	{ 55796, "57669ca842c749dea8d50eded31f3b7082b9e5482b73fb9ce60aa1d431e49dea" },
+	{ 66568, "d3d2f05745ce8af6e71b190782e560362cbc62571ffce7fb7c4b5bd848e88ea1" },
+	{ 71714, "71af9b2599f0a44cdaa8be0dba5d78f4c23dbb3730d69ee217e6a8f0649f9592" }
 };
 
 } // CryptoNote
