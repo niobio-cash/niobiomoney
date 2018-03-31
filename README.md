@@ -2,6 +2,8 @@
 
 The Niobio Cash is the Brazilian national cryptocurrency, just like Bitcoin but more anonymous and privacy centric with opaque and more analysis resistant blockchain. It is people's electronic cash, not connected to government or officials.
 
+
+
 ## Binaries
 
 You can download the binaries for Linux, MacOS, and Windows [HERE](https://github.com/niobio-cash/Downloads)
