@@ -1604,12 +1604,6 @@ bool Blockchain::checkTransactionInputs(const Transaction& tx, const Crypto::Has
     assert(inputIndex < tx.signatures.size());
     if (txin.type() == typeid(KeyInput)) {
 		
-	uint64_t txMixin = boost::get<KeyInput>(txin).outputIndexes.size();
-	  if (txMixin > CryptoNote::parameters::MAX_TX_MIXIN_SIZE) {
-        logger(DEBUGGING, BRIGHT_WHITE) << "Transaction << " << transactionHash << " hast too large mixin count.";
-        return false;
-      }
-	  
       const KeyInput& in_to_key = boost::get<KeyInput>(txin);
       if (!(!in_to_key.outputIndexes.empty())) { logger(TRACE) << "empty in_to_key.outputIndexes in transaction with id " << getObjectHash(tx); return false; }
 
