@@ -111,7 +111,7 @@ const size_t   COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT         =  1000;
 const int      P2P_DEFAULT_PORT                              =  8313;
 const int      RPC_DEFAULT_PORT                              =  8314;
 
-const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  10000;
+const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  15000;
 const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
 
 const size_t   P2P_CONNECTION_MAX_WRITE_BUFFER_SIZE          = 64 * 1024 * 1024; // 64 MB
