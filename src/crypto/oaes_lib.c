@@ -50,7 +50,7 @@ static const char _NR[] = {
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <process.h>
 #else
 #include <sys/types.h>

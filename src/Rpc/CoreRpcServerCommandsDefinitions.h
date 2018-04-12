@@ -612,6 +612,27 @@ struct F_COMMAND_RPC_GET_BLOCK_DETAILS {
   };
 };
 
+//-----------------------------------------------
+struct K_COMMAND_RPC_GET_TRANSACTIONS_BY_PAYMENT_ID {
+	struct request {
+		std::string payment_id;
+
+		void serialize(ISerializer &s) {
+			KV_MEMBER(payment_id)
+		}
+	};
+
+	struct response {
+		std::vector<f_transaction_short_response> transactions;
+		std::string status;
+
+		void serialize(ISerializer &s) {
+			KV_MEMBER(transactions)
+				KV_MEMBER(status)
+		}
+	};
+};
+
 struct F_COMMAND_RPC_GET_TRANSACTION_DETAILS {
   struct request {
     std::string hash;

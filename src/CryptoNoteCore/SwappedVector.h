@@ -159,6 +159,7 @@ public:
   const T& front();
   const T& back();
   void clear();
+  void clear_cache();
   void pop_back();
   void push_back(const T& item);
 
@@ -325,6 +326,11 @@ template<class T> void SwappedVector<T>::clear() {
 
   m_offsets.clear();
   m_itemsFileSize = 0;
+  m_items.clear();
+  m_cache.clear();
+}
+
+template<class T> void SwappedVector<T>::clear_cache() {
   m_items.clear();
   m_cache.clear();
 }

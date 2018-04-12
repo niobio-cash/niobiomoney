@@ -24,7 +24,7 @@
 #include "PaymentGateService.h"
 #include "version.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #include <winsvc.h>
 #else

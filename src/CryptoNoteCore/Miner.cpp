@@ -121,7 +121,7 @@ namespace CryptoNote
   bool miner::on_idle()
   {
     m_update_block_template_interval.call([&](){
-      if(is_mining()) 
+      if(is_mining())
         request_block_template();
       return true;
     });
@@ -160,7 +160,7 @@ namespace CryptoNote
         std::cout << "hashrate: " << std::setprecision(4) << std::fixed << hr << ENDL;
       }
     }
-    
+
     m_last_hr_merge_time = millisecondsSinceEpoch();
     m_hashes = 0;
   }
@@ -169,8 +169,8 @@ namespace CryptoNote
     if (!config.extraMessages.empty()) {
       std::string buff;
       if (!Common::loadFileToString(config.extraMessages, buff)) {
-        logger(ERROR, BRIGHT_RED) << "Failed to load file with extra messages: " << config.extraMessages; 
-        return false; 
+        logger(ERROR, BRIGHT_RED) << "Failed to load file with extra messages: " << config.extraMessages;
+        return false;
       }
       std::vector<std::string> extra_vec;
       boost::split(extra_vec, buff, boost::is_any_of("\n"), boost::token_compress_on );
@@ -215,7 +215,7 @@ namespace CryptoNote
   }
   //-----------------------------------------------------------------------------------------------------
   bool miner::start(const AccountPublicAddress& adr, size_t threads_count)
-  {   
+  {
     if (is_mining()) {
       logger(ERROR) << "Starting miner but it's already started";
       return false;
@@ -245,7 +245,7 @@ namespace CryptoNote
     logger(INFO) << "Mining has started with " << threads_count << " threads, good luck!";
     return true;
   }
-  
+
   //-----------------------------------------------------------------------------------------------------
   uint64_t miner::get_speed()
   {
@@ -254,9 +254,9 @@ namespace CryptoNote
     else
       return 0;
   }
-  
+
   //-----------------------------------------------------------------------------------------------------
-  void miner::send_stop_signal() 
+  void miner::send_stop_signal()
   {
     m_stop = true;
   }
@@ -408,7 +408,7 @@ namespace CryptoNote
         //we lucky!
         ++m_config.current_extra_message_index;
 
-        logger(INFO, GREEN) << "Found block for difficulty: " << local_diff;
+        logger(INFO, GREEN) << "Found block for difficulty " << local_diff;
 
         if(!m_handler.handle_block_found(b)) {
           --m_config.current_extra_message_index;

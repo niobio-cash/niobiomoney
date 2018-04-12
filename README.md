@@ -1,10 +1,18 @@
-The karbowanec is Ukrainian national cryptocurrency, just like Bitcoin but more anonymous and privacy centric with opaque and more analysis resistant blockchain. It is people's electronic cash, not connected to government or officials.
+# Niobio Cash
 
-## Building Karbo 
+The Niobio Cash is the Brazilian national cryptocurrency, just like Bitcoin but more anonymous and privacy centric with opaque and more analysis resistant blockchain. It is people's electronic cash, not connected to government or officials.
 
-### On *nix
 
-Dependencies: GCC 4.7.3 or later, CMake 2.8.6 or later, and Boost 1.55.
+
+## Binaries
+
+You can download the binaries for Linux, MacOS, and Windows [HERE](https://github.com/niobio-cash/Downloads)
+
+## Building Niobio 
+
+### On *nix and OSX
+
+Dependencies: GCC 4.7.3 or later, CMake 2.8.6 or later, and Boost 1.58.
 
 You may download them from:
 
@@ -13,7 +21,15 @@ You may download them from:
 * http://www.boost.org/
 * Alternatively, it may be possible to install them using a package manager.
 
-To build, change to a directory where this file is located, and run `make`. The resulting executables can be found in `build/release/src`.
+To build, go the the project folder - same level of src - and run:
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+
+The resulting executables can be found in `build/src`.
 
 **Advanced options:**
 
@@ -35,6 +51,3 @@ mkdir build
 cd build
 cmake -G "Visual Studio 12 Win64" ..
 ```
-
-And then do Build.
-Good luck!

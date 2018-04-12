@@ -181,6 +181,18 @@ using CryptoNote::ISerializer;
   struct COMMAND_RPC_RESET {
     typedef CryptoNote::EMPTY_STRUCT request;
     typedef CryptoNote::EMPTY_STRUCT response;
+  }; 
+  
+  struct COMMAND_RPC_GET_ADDRESS {
+    typedef CryptoNote::EMPTY_STRUCT request;
+
+    struct response {
+      std::string address;
+
+      void serialize(ISerializer& s) {
+        KV_MEMBER(address)
+      }
+    };
   };
 }
 }

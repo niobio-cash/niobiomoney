@@ -33,7 +33,7 @@ namespace {
   using namespace Crypto;
 
   inline AccountKeys accountKeysFromKeypairs(
-    const KeyPair& viewKeys, 
+    const KeyPair& viewKeys,
     const KeyPair& spendKeys) {
     AccountKeys ak;
     ak.address.spendPublicKey = spendKeys.publicKey;
@@ -57,10 +57,11 @@ namespace {
     return account;
   }
 
+
   AccountPublicAddress generateAddress() {
     return generateAccount().getAccountKeys().address;
   }
-  
+
   KeyImage generateKeyImage() {
     return Crypto::rand<KeyImage>();
   }
@@ -76,6 +77,7 @@ namespace {
       keyImage);
     return keyImage;
   }
+
 
   void addTestInput(ITransaction& transaction, uint64_t amount) {
     KeyInput input;
@@ -210,7 +212,7 @@ private:
 }
 
 namespace CryptoNote {
-inline bool operator == (const AccountKeys& a, const AccountKeys& b) { 
-  return memcmp(&a, &b, sizeof(a)) == 0; 
+inline bool operator == (const AccountKeys& a, const AccountKeys& b) {
+  return memcmp(&a, &b, sizeof(a)) == 0;
 }
 }

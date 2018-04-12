@@ -63,7 +63,7 @@
 
 #include <Logging/LoggerManager.h>
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <Windows.h>
 #include <crtdbg.h>
 #include <winsock2.h>
@@ -95,7 +95,7 @@ const command_line::arg_descriptor<std::string> arg_daemon_address = { "daemon-a
 const command_line::arg_descriptor<std::string> arg_daemon_host = { "daemon-host", "Use daemon instance at host <arg> instead of localhost", "" };
 const command_line::arg_descriptor<std::string> arg_password = { "password", "Wallet password", "", true };
 const command_line::arg_descriptor<uint16_t> arg_daemon_port = { "daemon-port", "Use daemon instance at port <arg> instead of 32348", 0 };
-const command_line::arg_descriptor<std::string> arg_log_file = {"log-file", "", ""};
+const command_line::arg_descriptor<std::string> arg_log_file = {"log-file", "Set the log file location", ""};
 const command_line::arg_descriptor<uint32_t> arg_log_level = { "set_log", "", INFO, true };
 const command_line::arg_descriptor<bool> arg_testnet = { "testnet", "Used to deploy test nets. The daemon must be launched with --testnet flag", false };
 const command_line::arg_descriptor< std::vector<std::string> > arg_command = { "command", "" };
@@ -258,7 +258,11 @@ struct TransferCommand {
           
           if (!remote_fee_address.empty()) {
             destination.address = remote_fee_address;
-            destination.amount = de.amount * 0.25 / 100;
+            int64_t remote_node_fee = de.amount * 0.25 / 100;
+            if (remote_node_fee > 10000000000000) {
+                remote_node_fee = 10000000000000;
+            }
+            destination.amount = remote_node_fee;
             dsts.push_back(destination);
           }
           
@@ -485,7 +489,7 @@ bool processServerAliasResponse(const std::string& s, std::string& address) {
 
 		// Courtesy of Monero Project
 		// make sure the txt record has "oa1:krb" and find it
-		auto pos = s.find("oa1:krb");
+		auto pos = s.find("oa1:nbr");
 		if (pos == std::string::npos)
 			return false;
 		// search from there to find "recipient_address="
@@ -1562,7 +1566,7 @@ bool simple_wallet::fetch_dns_txt(const std::string domain, std::string &record)
 		ns_type type = ns_t_txt;
 
 		const char * c_domain = (domain).c_str();
-		response = res_query(c_domain, C_IN, type, query_buffer, sizeof(query_buffer));
+		response = res_query(c_domain, 0, type, query_buffer, sizeof(query_buffer));
 
 		if (response < 0) {
 			return 1;
