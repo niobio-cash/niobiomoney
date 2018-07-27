@@ -231,6 +231,21 @@ bool core::get_stat_info(core_stat_info& st_inf) {
   return true;
 }
 
+bool core::check_tx_mixin(const Transaction& tx) {
+  size_t inputIndex = 0;
+  for (const auto& txin : tx.inputs) {
+    assert(inputIndex < tx.signatures.size());
+    if (txin.type() == typeid(KeyInput)) {
+      uint64_t txMixin = boost::get<KeyInput>(txin).outputIndexes.size();
+      if (txMixin > CryptoNote::parameters::MAX_TX_MIXIN_SIZE) {
+        logger(ERROR) << "Transaction " << getObjectHash(tx) << " has too large mixin count, rejected";
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 
 bool core::check_tx_semantic(const Transaction& tx, bool keeped_by_block) {
   if (!tx.inputs.size()) {
@@ -1013,6 +1028,14 @@ bool core::handleIncomingTransaction(const Transaction& tx, const Crypto::Hash& 
     return false;
   }
 
+  
+    if (!check_tx_mixin(tx)) {
+    logger(INFO) << "Transaction verification failed: mixin count for transaction " << txHash << " is too large, rejected";
+    tvc.m_verifivation_failed = true;
+    return false;
+  }
+  
+  
   if (!check_tx_semantic(tx, keptByBlock)) {
     logger(INFO) << "WRONG TRANSACTION BLOB, Failed to check tx " << txHash << " semantic, rejected";
     tvc.m_verifivation_failed = true;
