@@ -121,11 +121,12 @@ namespace CryptoNote {
       uint32_t height;
       Crypto::Hash hash = NULL_HASH;
       std::stringstream ss;
-      int del = record.find_first_of(':');
+      size_t del = record.find_first_of(':');
       std::string height_str = record.substr(0, del), hash_str = record.substr(del + 1, 64);
       ss.str(height_str);
       ss >> height;
       char c;
+      if (del == std::string::npos) continue;
       if ((ss.fail() || ss.get(c)) || !Common::podFromHex(hash_str, hash)) {
         logger(Logging::INFO) << "Failed to parse DNS checkpoint record: " << record;
         continue;
