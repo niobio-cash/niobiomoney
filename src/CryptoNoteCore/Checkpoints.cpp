@@ -131,9 +131,8 @@ namespace CryptoNote {
         continue;
       }
 
-      if (!(0 == m_points.count(height))) {
-        logger(Logging::INFO) << "Checkpoint already exists for height: " << height << ". Ignoring DNS checkpoint.";
-      } else {
+      if (0 == m_points.count(height)) {
+        logger(Logging::INFO) << "Adding DNS checkpoint for height " << height << " with hash " << hash_str;
         add_checkpoint(height, hash_str);
       }
     }
