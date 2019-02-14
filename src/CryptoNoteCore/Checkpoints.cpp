@@ -17,6 +17,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Checkpoints.h"
+#include "../CryptoNoteConfig.h"
 #include "Common/StringTools.h"
 #include "Common/DnsTools.h"
 #include <cstdlib>
@@ -79,62 +80,60 @@ namespace CryptoNote {
     return check_block(height, h, ignored);
   }
   //---------------------------------------------------------------------------
-  bool Checkpoints::is_alternative_block_allowed(uint32_t  blockchain_height,
-    uint32_t  block_height) const {
-      if (0 == block_height)
+  bool Checkpoints::is_alternative_block_allowed(uint32_t  blockchain_height, uint32_t block_height) const {
+    if (0 == block_height) return false;
+    if (block_height < blockchain_height - CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW && !is_in_checkpoint_zone(block_height)) {
+      logger(Logging::ERROR, Logging::BRIGHT_WHITE) << "An attempt of too deep reorganization: " << blockchain_height - block_height << ", BLOCK REJECTED";
       return false;
+    }
+    auto it = m_points.upper_bound(blockchain_height);
+    // Is blockchain_height before the first checkpoint?
+    if (it == m_points.begin())
+    return true;
 
-      auto it = m_points.upper_bound(blockchain_height);
-      // Is blockchain_height before the first checkpoint?
-      if (it == m_points.begin())
-      return true;
+    --it;
+    uint32_t  checkpoint_height = it->first;
+    return checkpoint_height < block_height;
+  }
 
-      --it;
-      uint32_t  checkpoint_height = it->first;
-      return checkpoint_height < block_height;
+  std::vector<uint32_t> Checkpoints::getCheckpointHeights() const {
+    std::vector<uint32_t> checkpointHeights;
+    checkpointHeights.reserve(m_points.size());
+    for (const auto& it : m_points) {
+      checkpointHeights.push_back(it.first);
     }
 
-    std::vector<uint32_t> Checkpoints::getCheckpointHeights() const {
-      std::vector<uint32_t> checkpointHeights;
-      checkpointHeights.reserve(m_points.size());
-      for (const auto& it : m_points) {
-        checkpointHeights.push_back(it.first);
-      }
+    return checkpointHeights;
+  }
 
-      return checkpointHeights;
+  bool Checkpoints::load_checkpoints_from_dns() {
+    // better code from Karbo developers
+    std::string domain("checkpoints.niobiocash.money");
+    std::vector<std::string>records;
+
+    logger(Logging::INFO) << "Fetching DNS checkpoint records.";
+
+    if (!Common::fetch_dns_txt(domain, records)) {
+      logger(Logging::INFO) << "Failed to lookup DNS checkpoint records from " << domain;
     }
 
-    bool Checkpoints::load_checkpoints_from_dns()
-    {
-      // better code from Karbo developers
-      std::string domain("checkpoints.niobiocash.money");
-      std::vector<std::string>records;
-
-      if (!Common::fetch_dns_txt(domain, records)) {
-        logger(Logging::INFO) << "Failed to lookup DNS checkpoint records from " << domain;
+    for (const auto& record : records) {
+      uint32_t height;
+      Crypto::Hash hash = NULL_HASH;
+      std::stringstream ss;
+      int del = record.find_first_of(':');
+      std::string height_str = record.substr(0, del), hash_str = record.substr(del + 1, 64);
+      ss.str(height_str);
+      ss >> height;
+      char c;
+      if ((ss.fail() || ss.get(c)) || !Common::podFromHex(hash_str, hash)) {
+        logger(Logging::INFO) << "Failed to parse DNS checkpoint record: " << record;
+        continue;
       }
-
-      for (const auto& record : records) {
-        uint32_t height;
-        Crypto::Hash hash = NULL_HASH;
-        std::stringstream ss;
-        int del = record.find_first_of(':');
-        std::string height_str = record.substr(0, del), hash_str = record.substr(del + 1, 64);
-        ss.str(height_str);
-        ss >> height;
-        char c;
-        if ((ss.fail() || ss.get(c)) || !Common::podFromHex(hash_str, hash)) {
-          logger(Logging::INFO) << "Failed to parse DNS checkpoint record: " << record;
-          continue;
-        }
-
-        if (!(0 == m_points.count(height))) {
-          logger(Logging::INFO) << "Checkpoint already exists for height: " << height << ". Ignoring DNS checkpoint.";
-        } else {
-          add_checkpoint(height, hash_str);
-        }
+      if (0 == m_points.count(height)) {
+        add_checkpoint(height, hash_str);
       }
-
-      return true;
     }
+    return true;
+  }
 }

@@ -55,7 +55,7 @@ private:
   pthread_mutex_t& mutex;
 };
 
-const size_t STACK_SIZE = 512 * 1024;
+const size_t STACK_SIZE = 64 * 1024;
 
 }
 

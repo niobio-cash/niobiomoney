@@ -88,6 +88,8 @@ private:
 
 } //namespace
 
+using namespace Logging;
+
 namespace CryptoNote {
 
 class SyncStarter : public CryptoNote::IWalletLegacyObserver {
@@ -208,7 +210,7 @@ void WalletLegacy::initAndLoad(std::istream& source, const std::string& password
 
   m_password = password;
   m_state = LOADING;
-      
+
   m_asyncContextCounter.addAsyncContext();
   std::thread loader(&WalletLegacy::doLoad, this, std::ref(source));
   loader.detach();
@@ -220,14 +222,14 @@ void WalletLegacy::initSync() {
   sub.transactionSpendableAge = 1;
   sub.syncStart.height = 0;
   sub.syncStart.timestamp = m_account.get_createtime() - ACCOUN_CREATE_TIME_ACCURACY;
-  
+
   auto& subObject = m_transfersSync.addSubscription(sub);
   m_transferDetails = &subObject.getContainer();
   subObject.addObserver(this);
 
   m_sender.reset(new WalletTransactionSender(m_currency, m_transactionsCache, m_account.getAccountKeys(), *m_transferDetails));
   m_state = INITIALIZED;
-  
+
   m_blockchainSync.addObserver(this);
 }
 
@@ -235,11 +237,11 @@ void WalletLegacy::doLoad(std::istream& source) {
   ContextCounterHolder counterHolder(m_asyncContextCounter);
   try {
     std::unique_lock<std::mutex> lock(m_cacheMutex);
-    
+
     std::string cache;
     WalletLegacySerializer serializer(m_account, m_transactionsCache);
     serializer.deserialize(source, m_password, cache);
-      
+
     initSync();
 
     try {
@@ -250,6 +252,18 @@ void WalletLegacy::doLoad(std::istream& source) {
     } catch (const std::exception&) {
       // ignore cache loading errors
     }
+
+	// Read all output keys cache
+    std::vector<TransactionOutputInformation> allTransfers;
+    m_transferDetails->getOutputs(allTransfers, ITransfersContainer::IncludeAll);
+    auto message = "Loaded " + std::to_string(allTransfers.size()) + " known transfer(s)\r\n";
+    m_consoleLogger("WalletLegacy", INFO, boost::posix_time::second_clock::local_time(), message);
+    for (auto& o : allTransfers) {
+      if (o.type == TransactionTypes::OutputType::Key) {
+        m_transfersSync.addPublicKeysSeen(m_account.getAccountKeys().address, o.transactionHash, o.outputKey);
+      }
+    }
+
   } catch (std::system_error& e) {
     runAtomic(m_cacheMutex, [this] () {this->m_state = WalletLegacy::NOT_INITIALIZED;} );
     m_observerManager.notify(&IWalletLegacyObserver::initCompleted, e.code());
@@ -283,7 +297,7 @@ void WalletLegacy::shutdown() {
   m_asyncContextCounter.waitAsyncContextsFinish();
 
   m_sender.release();
-   
+
   {
     std::unique_lock<std::mutex> lock(m_cacheMutex);
     m_isStopping = false;
@@ -350,7 +364,7 @@ void WalletLegacy::doSave(std::ostream& destination, bool saveDetailed, bool sav
   try {
     m_blockchainSync.stop();
     std::unique_lock<std::mutex> lock(m_cacheMutex);
-    
+
     WalletLegacySerializer serializer(m_account, m_transactionsCache);
     std::string cache;
 

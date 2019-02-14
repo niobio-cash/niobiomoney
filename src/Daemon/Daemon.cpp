@@ -67,6 +67,7 @@ namespace
   const command_line::arg_descriptor<double_t>       arg_set_fee_percent = { "fee", "Sets fee percentage for light wallets. Format float. Default is 0.25.", 0.25 };
   const command_line::arg_descriptor<bool>        arg_testnet_on  = {"testnet", "Used to deploy test nets. Checkpoints and hardcoded seeds are ignored, "
     "network id is changed. Use it with --data-dir flag. The wallet must be launched with --testnet flag.", false};
+  const command_line::arg_descriptor<bool>        arg_no_checkpoints = {"nocheckpoints", "Don't use checkpoints"};
 }
 
 bool command_line_preprocessor(const boost::program_options::variables_map& vm, LoggerRef& logger);
@@ -119,7 +120,6 @@ int main(int argc, char* argv[])
     // tools::get_default_data_dir() can't be called during static initialization
     command_line::add_arg(desc_cmd_only, command_line::arg_data_dir, Tools::getDefaultDataDirectory());
     command_line::add_arg(desc_cmd_only, arg_config_file);
-
     command_line::add_arg(desc_cmd_sett, arg_log_file);
     command_line::add_arg(desc_cmd_sett, arg_log_level);
     command_line::add_arg(desc_cmd_sett, arg_cache_size);
@@ -131,6 +131,7 @@ int main(int argc, char* argv[])
   command_line::add_arg(desc_cmd_sett, arg_set_fee_percent);
 	command_line::add_arg(desc_cmd_sett, arg_enable_blockchain_indexes);
 	command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
+  command_line::add_arg(desc_cmd_sett, arg_no_checkpoints);
 
     RpcServerConfig::initOptions(desc_cmd_sett);
     CoreConfig::initOptions(desc_cmd_sett);
@@ -216,16 +217,19 @@ int main(int argc, char* argv[])
     }
     CryptoNote::Currency currency = currencyBuilder.currency();
     CryptoNote::core ccore(currency, nullptr, logManager, command_line::get_arg(vm, arg_enable_blockchain_indexes), command_line::get_arg(vm,arg_cache_size));
-
-    CryptoNote::Checkpoints checkpoints(logManager);
-    for (const auto& cp : CryptoNote::CHECKPOINTS) {
-      checkpoints.add_checkpoint(cp.height, cp.blockId);
+    bool use_checkpoints = !command_line::get_arg(vm, arg_no_checkpoints);
+    if(use_checkpoints) {
+      CryptoNote::Checkpoints checkpoints(logManager);
+      for (const auto& cp : CryptoNote::CHECKPOINTS) {
+        checkpoints.add_checkpoint(cp.height, cp.blockId);
+      }
+      #ifndef __ANDROID__
+        checkpoints.load_checkpoints_from_dns();
+      #endif
+      if (!testnet_mode) {
+        ccore.set_checkpoints(std::move(checkpoints));
+      }
     }
-    checkpoints.load_checkpoints_from_dns();
-    if (!testnet_mode) {
-      ccore.set_checkpoints(std::move(checkpoints));
-    }
-
     CoreConfig coreConfig;
     coreConfig.init(vm);
     NetNodeConfig netNodeConfig;

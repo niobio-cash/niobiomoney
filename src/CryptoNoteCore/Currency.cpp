@@ -22,6 +22,7 @@
 #include <cctype>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
+#include <bitset>
 #include "../Common/Base58.h"
 #include "../Common/int-util.h"
 #include "../Common/StringTools.h"
@@ -127,7 +128,10 @@ namespace CryptoNote {
 	}
 
 	uint32_t Currency::upgradeHeight(uint8_t majorVersion) const {
-		if (majorVersion == BLOCK_MAJOR_VERSION_5) {
+		if (majorVersion == BLOCK_MAJOR_VERSION_6) {
+			return m_upgradeHeightV6;
+		}
+		else if (majorVersion == BLOCK_MAJOR_VERSION_5) {
 			return m_upgradeHeightV5;
 		}
 		else if (majorVersion == BLOCK_MAJOR_VERSION_4) {
@@ -158,6 +162,15 @@ namespace CryptoNote {
 		assert(m_emissionSpeedFactorV5 > 0 && m_emissionSpeedFactorV5 <= 8 * sizeof(uint64_t));
 
 		uint64_t baseReward = 0;
+		/*
+		if(blockMajorVersion >= BLOCK_MAJOR_VERSION_6) {
+			baseReward = ((m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactorV5) & ~m_emissionReductorV6;
+			logger(INFO) << std::bitset<64>((m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactorV5) << " " << std::bitset<64>(~m_emissionReductorV6) << " " << std::bitset<64>(baseReward);
+			if (baseReward == 0) {
+				baseReward = ((m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactorV5);
+			}
+		} else
+		*/
 		if (blockMajorVersion >= BLOCK_MAJOR_VERSION_5) {
 			baseReward = (m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactorV5;
 		} else {
@@ -500,13 +513,75 @@ namespace CryptoNote {
 	}
 
 	difficulty_type Currency::nextDifficulty(uint8_t blockMajorVersion, std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const {
-		if (blockMajorVersion >= BLOCK_MAJOR_VERSION_4) {
+		if (blockMajorVersion >= BLOCK_MAJOR_VERSION_6) {
+			return nextDifficultyByLWMA1(timestamps, cumulativeDifficulties);
+		} else if (blockMajorVersion == BLOCK_MAJOR_VERSION_5 || blockMajorVersion == BLOCK_MAJOR_VERSION_4) {
 			return nextDifficultyV4(timestamps, cumulativeDifficulties);
 		} else if (blockMajorVersion == BLOCK_MAJOR_VERSION_3 || blockMajorVersion == BLOCK_MAJOR_VERSION_2) {
 				return nextDifficultyV2(timestamps, cumulativeDifficulties);
 		} else {
 				return nextDifficultyV1(timestamps, cumulativeDifficulties);
 		}
+	}
+
+	difficulty_type Currency::nextDifficultyByLWMA1(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties) const {
+		// LWMA-1 difficulty algorithm
+		// Copyright (c) 2017-2018 Zawy, MIT License
+		// https://github.com/zawy12/difficulty-algorithms/issues/3
+		// See commented version for explanations & required config file changes. Fix FTL and MTP!
+		uint64_t  T = static_cast<int64_t>(m_difficultyTarget);
+		uint64_t  N = static_cast<int64_t>(CryptoNote::parameters::DIFFICULTY_WINDOW_V4 - 1);
+		uint64_t  L(0), next_D, i, this_timestamp(0), previous_timestamp(0), avg_D;
+
+		assert(timestamps.size() == cumulative_difficulties.size() && timestamps.size() <= N+1 );
+
+		// If it's a new coin, do startup code. Do not remove in case other coins copy your code.
+		uint64_t difficulty_guess = 100000;
+		if (timestamps.size() <= 12 ) {   return difficulty_guess;   }
+		if ( timestamps.size()  < N +1 ) { N = timestamps.size()-1;  }
+
+		// If hashrate/difficulty ratio after a fork is < 1/3 prior ratio, hardcode D for N+1 blocks after fork.
+		// This will also cover up a very common type of backwards-incompatible fork.
+		// difficulty_guess = 100000; //  Dev may change.  Guess low than anything expected.
+		// if ( height <= UPGRADE_HEIGHT + 1 + N ) { return difficulty_guess;  }
+
+		previous_timestamp = timestamps[0];
+		for ( i = 1; i <= N; i++) {
+			// Safely prevent out-of-sequence timestamps
+			if ( timestamps[i]  > previous_timestamp ) {   this_timestamp = timestamps[i];  }
+			else {  this_timestamp = previous_timestamp;   }
+			L +=  i*std::min(6*T ,this_timestamp - previous_timestamp);
+			previous_timestamp = this_timestamp;
+		}
+		if (L < N*N*T/20 ) { L =  N*N*T/20; }
+		avg_D = ( cumulative_difficulties[N] - cumulative_difficulties[0] )/ N;
+
+		// Prevent round off error for small D and overflow for large D.
+		if (avg_D > 2000000*N*N*T) {
+			next_D = (avg_D/(200*L))*(N*(N+1)*T*97);
+		}
+		else {    next_D = (avg_D*N*(N+1)*T*97)/(200*L);    }
+
+		// Optional. Make all insignificant digits zero for easy reading.
+		i = 1000000000;
+		while (i > 1) {
+			if ( next_D > i*100 ) { next_D = ((next_D+i/2)/i)*i; break; }
+			else { i /= 10; }
+		}
+		// Make least 2 digits = size of hash rate change last 11 blocks if it's statistically significant.
+		// D=2540035 => hash rate 3.5x higher than D expected. Blocks coming 3.5x too fast.
+		if ( next_D > 10000 ) {
+			uint64_t est_HR = (10*(11*T+(timestamps[N]-timestamps[N-11])/2)) /
+			(timestamps[N]-timestamps[N-11]+1);
+			if (  est_HR > 5 && est_HR < 22 )  {  est_HR=0;   }
+			est_HR = std::min(static_cast<uint64_t>(99), est_HR);
+			next_D = ((next_D+50)/100)*100 + est_HR;
+		}
+		if (next_D < 100000) {
+			next_D = 100000;
+		}
+
+		return  next_D;
 	}
 
 	difficulty_type Currency::nextDifficultyV4(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const {
@@ -609,7 +684,6 @@ namespace CryptoNote {
 
 	difficulty_type Currency::nextDifficultyV1(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const {
 		assert(m_difficultyWindow >= 2);
-
 		if (timestamps.size() > m_difficultyWindow) {
 			timestamps.resize(m_difficultyWindow);
 			cumulativeDifficulties.resize(m_difficultyWindow);
@@ -653,7 +727,7 @@ namespace CryptoNote {
 
 	bool Currency::checkProofOfWorkV1(cn_pow_hash_v2& hash_ctx, const Block& block, difficulty_type currentDiffic,
 		Crypto::Hash& proofOfWork) const {
-		
+
 		if (BLOCK_MAJOR_VERSION_1 != block.majorVersion) {
 			return false;
 		}
@@ -667,7 +741,7 @@ namespace CryptoNote {
 
 	bool Currency::checkProofOfWorkV2(cn_pow_hash_v2& hash_ctx, const Block& block, difficulty_type currentDiffic,
 		Crypto::Hash& proofOfWork) const {
-			
+
 		if (block.majorVersion < BLOCK_MAJOR_VERSION_2) {
 			return false;
 		}
@@ -711,11 +785,11 @@ namespace CryptoNote {
 		switch (block.majorVersion) {
 		case BLOCK_MAJOR_VERSION_1:
 			return checkProofOfWorkV1(hash_ctx, block, currentDiffic, proofOfWork);
-
 		case BLOCK_MAJOR_VERSION_2:
 		case BLOCK_MAJOR_VERSION_3:
 		case BLOCK_MAJOR_VERSION_4:
 		case BLOCK_MAJOR_VERSION_5:
+		case BLOCK_MAJOR_VERSION_6:
 			return checkProofOfWorkV2(hash_ctx, block, currentDiffic, proofOfWork);
 		}
 
@@ -761,6 +835,7 @@ namespace CryptoNote {
 		moneySupply(parameters::MONEY_SUPPLY);
 		emissionSpeedFactor(parameters::EMISSION_SPEED_FACTOR);
 		emissionSpeedFactorV5(parameters::EMISSION_SPEED_FACTOR_V5);
+		emissionReductorV6(parameters::EMISSION_REDUCTOR_V6);
 		cryptonoteCoinVersion(parameters::CRYPTONOTE_COIN_VERSION);
 
 		rewardBlocksWindow(parameters::CRYPTONOTE_REWARD_BLOCKS_WINDOW);
@@ -796,6 +871,7 @@ namespace CryptoNote {
 		upgradeHeightV3(parameters::UPGRADE_HEIGHT_V3);
 		upgradeHeightV4(parameters::UPGRADE_HEIGHT_V4);
 		upgradeHeightV5(parameters::UPGRADE_HEIGHT_V5);
+		upgradeHeightV6(parameters::UPGRADE_HEIGHT_V6);
 		upgradeVotingThreshold(parameters::UPGRADE_VOTING_THRESHOLD);
 		upgradeVotingWindow(parameters::UPGRADE_VOTING_WINDOW);
 		upgradeWindow(parameters::UPGRADE_WINDOW);
@@ -832,6 +908,15 @@ namespace CryptoNote {
 		}
 
 		m_currency.m_emissionSpeedFactorV5 = val;
+		return *this;
+	}
+
+	CurrencyBuilder& CurrencyBuilder::emissionReductorV6(uint64_t val) {
+		if (val <= 0) {
+			throw std::invalid_argument("val at emissionReductorV6() is zero or less");
+		}
+
+		m_currency.m_emissionReductorV6 = val;
 		return *this;
 	}
 

@@ -42,6 +42,7 @@ const uint64_t TAIL_EMISSION_REWARD                          = 0; //UINT64_C(100
 const size_t CRYPTONOTE_COIN_VERSION                         = 1;
 const unsigned EMISSION_SPEED_FACTOR                         = 18;
 const unsigned EMISSION_SPEED_FACTOR_V5                      = 20;
+const uint64_t EMISSION_REDUCTOR_V6                          = UINT64_C(2147483648);
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 static_assert(EMISSION_SPEED_FACTOR_V5 <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 const size_t   CRYPTONOTE_REWARD_BLOCKS_WINDOW               = 100;
@@ -74,13 +75,16 @@ const uint64_t CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME = 60 * 60 * 24 * 1;
 const uint64_t CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL = 7; // 7;  // CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL * CRYPTONOTE_MEMPOOL_TX_LIVETIME = time to forget tx
 
 const size_t   FUSION_TX_MAX_SIZE                            = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_CURRENT * 30 / 100;
-const size_t   FUSION_TX_MIN_INPUT_COUNT                     = 12;
-const size_t   FUSION_TX_MIN_IN_OUT_COUNT_RATIO              = 4;
+//const size_t   FUSION_TX_MIN_INPUT_COUNT                     = 12;
+const size_t   FUSION_TX_MIN_INPUT_COUNT                     = 4;
+const size_t   FUSION_TX_MIN_IN_OUT_COUNT_RATIO              = 2;
 
 const uint32_t UPGRADE_HEIGHT_V2                             = 1;
 const uint32_t UPGRADE_HEIGHT_V3                             = 30;
 const uint32_t UPGRADE_HEIGHT_V4                             = 73731;
 const uint32_t UPGRADE_HEIGHT_V5                             = 92999;
+const uint32_t UPGRADE_HEIGHT_V6                             = 153559;
+
 const unsigned UPGRADE_VOTING_THRESHOLD                      = 90;   // percent
 const uint32_t UPGRADE_VOTING_WINDOW                         = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;  // blocks
 const uint32_t UPGRADE_WINDOW                                = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;  // blocks
@@ -106,6 +110,7 @@ const uint8_t  BLOCK_MAJOR_VERSION_2                         =  2;
 const uint8_t  BLOCK_MAJOR_VERSION_3                         =  3;
 const uint8_t  BLOCK_MAJOR_VERSION_4                         =  4;
 const uint8_t  BLOCK_MAJOR_VERSION_5                         =  5;
+const uint8_t  BLOCK_MAJOR_VERSION_6                         =  6;
 const uint8_t  BLOCK_MINOR_VERSION_0                         =  0;
 const uint8_t  BLOCK_MINOR_VERSION_1                         =  1;
 
@@ -201,7 +206,10 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {
 	{ 76072, "85313bc7fc25455f71ceab7660470b4bb6d22d6c72551f80a55308616d7ec19a" },
 	{ 81895, "759d10ef6fcdd6f0b91ca59369d5c4cb0543102d054c421210bd57a4cbdae5dd" },
 	{ 90132, "6012c9bf6e8970f49de3736a4e952a465c61c67770d3c44e83509c9b2375ccc4" },
-	{ 94584, "cdc4a440b8a9e3bc4b1e665421d22d8c4895e3df92dcad248492a346aad63c28" }
+	{ 94584, "cdc4a440b8a9e3bc4b1e665421d22d8c4895e3df92dcad248492a346aad63c28" },
+	{ 153559, "f18fd86dfd2a2d2d5bc8b4ae33994921b8afed5fa75faa7142d78cb4e00241f7" },
+	{ 153560, "d4199fa557bbb0e2d29dc306a65c731f210fe4cf47293230828ccba96b13929d" },
+	{ 153790, "74a87612eefb8a029e26e9ce6e22524a88b9d4ad9964524e025135d1d8a650af" }
 };
 
 } // CryptoNote
