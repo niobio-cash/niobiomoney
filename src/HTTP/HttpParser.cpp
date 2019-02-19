@@ -145,6 +145,7 @@ void HttpParser::readHeaders(std::istream& stream, HttpRequest::Headers& headers
     name.clear();
     value.clear();
   }
+  headers[name] = value;
 }
 
 bool HttpParser::readHeader(std::istream& stream, std::string& name, std::string& value) {
