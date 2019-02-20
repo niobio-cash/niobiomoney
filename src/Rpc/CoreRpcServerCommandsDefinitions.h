@@ -329,11 +329,13 @@ struct COMMAND_RPC_GET_FEE_ADDRESS {
 
   struct response {
     std::string fee_address;
-	std::string status;
+    double_t fee_percent;
+	  std::string status;
 
     void serialize(ISerializer &s) {
       KV_MEMBER(fee_address)
-	  KV_MEMBER(status)
+      KV_MEMBER(fee_percent)
+	    KV_MEMBER(status)
     }
   };
 };
