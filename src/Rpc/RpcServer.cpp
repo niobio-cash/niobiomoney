@@ -102,7 +102,6 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
   { "/gettransactions", { jsonMethod<COMMAND_RPC_GET_TRANSACTIONS>(&RpcServer::on_get_transactions), false } },
   { "/sendrawtransaction", { jsonMethod<COMMAND_RPC_SEND_RAW_TX>(&RpcServer::on_send_raw_tx), false } },
   { "/feeaddress", { jsonMethod<COMMAND_RPC_GET_FEE_ADDRESS>(&RpcServer::on_get_fee_address), true } },
-  { "/feeinfo", { jsonMethod<COMMAND_RPC_GET_FEE_INFO>(&RpcServer::on_get_fee_info), true } },
   { "/peers", { jsonMethod<COMMAND_RPC_GET_PEER_LIST>(&RpcServer::on_get_peer_list), true } },
 
   // disabled in restricted rpc mode
@@ -538,20 +537,10 @@ bool RpcServer::on_get_fee_address(const COMMAND_RPC_GET_FEE_ADDRESS::request& r
   }
   res.fee_address = m_fee_address;
   if(m_fee_percent > 0) {
-    res.fee_percent = m_fee_percent;    
+    res.fee_percent = m_fee_percent;
+  } else {
+    res.fee_percent = 0;
   }
-  res.status = CORE_RPC_STATUS_OK;
-  return true;
-}
-
-bool RpcServer::on_get_fee_info(const COMMAND_RPC_GET_FEE_INFO::request& req, COMMAND_RPC_GET_FEE_INFO::response& res) {
-  if (m_fee_address.empty()) {
-  	res.status = "Node's fee address is not set";
-  	return false;
-  }
-  res.fee_address = m_fee_address;
-
-  res.fee_percent = m_fee_percent;
   res.status = CORE_RPC_STATUS_OK;
   return true;
 }
