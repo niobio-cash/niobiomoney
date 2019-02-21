@@ -22,7 +22,7 @@
 #include "CryptoNoteCore/CryptoNoteBasic.h"
 #include "CryptoNoteCore/Difficulty.h"
 #include "crypto/hash.h"
-
+#include <math.h>
 #include "Serialization/SerializationOverloads.h"
 
 namespace CryptoNote {
@@ -345,7 +345,7 @@ struct COMMAND_RPC_GET_FEE_INFO {
 
   struct response {
     std::string fee_address;
-    double_t fee_percent;
+    double_t fee_percent; 
 	  std::string status;
 
     void serialize(ISerializer &s) {
