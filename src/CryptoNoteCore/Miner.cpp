@@ -272,16 +272,16 @@ namespace CryptoNote
     }
 
     m_threads.clear();
-    logger(INFO) << "Mining has been stopped, " << m_threads.size() << " finished" ;
+    logger(INFO) << "We had " << m_threads.size() << " mining threads running. All finished." ;
     return true;
   }
   //-----------------------------------------------------------------------------------------------------
   bool miner::find_nonce_for_given_block(Block& bl, const difficulty_type& diffic) {
 
     unsigned nthreads = std::thread::hardware_concurrency();
-    
+
 	cn_pow_hash_v2 hash_ctx;
-	
+
     if (nthreads > 0 && diffic > 5) {
       std::vector<std::future<void>> threads(nthreads);
       std::atomic<uint32_t> foundNonce;
@@ -290,7 +290,7 @@ namespace CryptoNote
 
       for (unsigned i = 0; i < nthreads; ++i) {
         threads[i] = std::async(std::launch::async, [&, i]() {
-			
+
           Crypto::Hash h;
 
           Block lb(bl); // copy to local block
