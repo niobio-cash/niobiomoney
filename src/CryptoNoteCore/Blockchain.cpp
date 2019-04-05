@@ -992,8 +992,6 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
 
   }
 
-  size_t currentHeight = alt_chain.size() ? alt_chain.front()->second.height : bei.height;
-
   return m_currency.nextDifficulty(BlockMajorVersion, timestamps, commulative_difficulties);
 }
 
