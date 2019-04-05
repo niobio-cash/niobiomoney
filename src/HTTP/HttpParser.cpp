@@ -70,10 +70,10 @@ void HttpParser::receiveRequest(std::istream& stream, HttpRequest& request) {
 void HttpParser::receiveResponse(std::istream& stream, HttpResponse& response) {
   std::string httpVersion;
   readWord(stream, httpVersion);
-  
+
   std::string status;
   char c;
-  
+
   stream.get(c);
   while (stream.good() && c != '\r') { //Till the end
     status += c;
@@ -90,7 +90,7 @@ void HttpParser::receiveResponse(std::istream& stream, HttpResponse& response) {
   }
 
   response.setStatus(parseResponseStatusFromString(status));
-  
+
   std::string name;
   std::string value;
 
@@ -107,7 +107,7 @@ void HttpParser::receiveResponse(std::istream& stream, HttpResponse& response) {
   if (it != headers.end()) {
     length = std::stoul(it->second);
   }
-  
+
   std::string body;
   if (length) {
     readBody(stream, body, length);
@@ -145,8 +145,7 @@ void HttpParser::readHeaders(std::istream& stream, HttpRequest::Headers& headers
     name.clear();
     value.clear();
   }
-
-  headers[name] = value; //use insert
+  headers[name] = value;
 }
 
 bool HttpParser::readHeader(std::istream& stream, std::string& name, std::string& value) {
@@ -184,7 +183,7 @@ bool HttpParser::readHeader(std::istream& stream, std::string& name, std::string
 
   stream.get(c);
   if (c != '\n') {
-    throw std::system_error(make_error_code(CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL));
+    return false;
   }
 
   std::transform(name.begin(), name.end(), name.begin(), ::tolower);

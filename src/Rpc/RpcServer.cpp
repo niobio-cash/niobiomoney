@@ -19,7 +19,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "RpcServer.h"
-
+#include <iostream>
 #include <future>
 #include <unordered_map>
 
@@ -162,15 +162,14 @@ bool RpcServer::processJsonRpcRequest(const HttpRequest& request, HttpResponse& 
       { "getcurrencyid", { makeMemberMethod(&RpcServer::on_get_currency_id), true } },
       { "submitblock", { makeMemberMethod(&RpcServer::on_submitblock), false } },
       { "getlastblockheader", { makeMemberMethod(&RpcServer::on_get_last_block_header), false } },
-      { "getblockheaderbyhash", { makeMemberMethod(&RpcServer::on_get_block_header_by_hash), false } },
       { "getblockheaderbyheight", { makeMemberMethod(&RpcServer::on_get_block_header_by_height), false } },
       { "f_blocks_list_json", { makeMemberMethod(&RpcServer::f_on_blocks_list_json), false } },
       { "f_blocks_limited_json", { makeMemberMethod(&RpcServer::f_on_blocks_limited_json), false } },
       { "f_block_json", { makeMemberMethod(&RpcServer::f_on_block_json), false } },
       { "f_transaction_json", { makeMemberMethod(&RpcServer::f_on_transaction_json), false } },
       { "f_pool_json", { makeMemberMethod(&RpcServer::f_on_pool_json), false } },
-      { "k_transactions_by_payment_id", { makeMemberMethod(&RpcServer::k_on_transactions_by_payment_id), false } }
-
+      { "k_transactions_by_payment_id", { makeMemberMethod(&RpcServer::k_on_transactions_by_payment_id), false } },
+	    { "validateaddress", { makeMemberMethod(&RpcServer::on_validate_address), false } },
     };
 
     auto it = jsonRpcHandlers.find(jsonRequest.getMethod());
@@ -207,6 +206,11 @@ bool RpcServer::enableCors(const std::string domain) {
 
 bool RpcServer::setFeeAddress(const std::string fee_address) {
   m_fee_address = fee_address;
+  return true;
+}
+
+bool RpcServer::setFeePercent(const double_t fee_percent) {
+  m_fee_percent = fee_percent;
   return true;
 }
 
@@ -527,10 +531,15 @@ bool RpcServer::on_stop_daemon(const COMMAND_RPC_STOP_DAEMON::request& req, COMM
 
 bool RpcServer::on_get_fee_address(const COMMAND_RPC_GET_FEE_ADDRESS::request& req, COMMAND_RPC_GET_FEE_ADDRESS::response& res) {
   if (m_fee_address.empty()) {
-	res.status = "Node's fee address is not set";
-	return false;
+  	res.status = "Node's fee address is not set";
+  	return false;
   }
   res.fee_address = m_fee_address;
+  if(m_fee_percent > 0) {
+    res.fee_percent = m_fee_percent;
+  } else {
+    res.fee_percent = 0;
+  }
   res.status = CORE_RPC_STATUS_OK;
   return true;
 }
@@ -1143,5 +1152,17 @@ bool RpcServer::on_get_block_header_by_height(const COMMAND_RPC_GET_BLOCK_HEADER
   return true;
 }
 
+  bool RpcServer::on_validate_address(const COMMAND_RPC_VALIDATE_ADDRESS::request& req, COMMAND_RPC_VALIDATE_ADDRESS::response& res) {
+    AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
+    bool r = m_core.currency().parseAccountAddressString(req.address, acc);
+    res.isvalid = r;
+    if (r) {
+      res.address = m_core.currency().accountAddressAsString(acc);
+      res.spendPublicKey = Common::podToHex(acc.spendPublicKey);
+      res.viewPublicKey = Common::podToHex(acc.viewPublicKey);
+    }
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
 
 }

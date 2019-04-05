@@ -1114,4 +1114,30 @@ std::vector<TransactionsInBlockRpcInfo> WalletService::getRpcTransactions(uint32
   return convertTransactionsInBlockInfoToTransactionsInBlockRpcInfo(filteredTransactions);
 }
 
+  std::error_code WalletService::validateAddress(const std::string& address, bool& isvalid, std::string& _address, std::string& spendPublicKey, std::string& viewPublicKey) {
+    try {
+      System::EventLock lk(readyEvent);
+
+      CryptoNote::AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
+      if (currency.parseAccountAddressString(address, acc)) {
+        isvalid = true;
+        _address = currency.accountAddressAsString(acc);
+        spendPublicKey = Common::podToHex(acc.spendPublicKey);
+        viewPublicKey = Common::podToHex(acc.viewPublicKey);
+      }
+      else {
+        isvalid = false;
+      }
+    }
+    catch (std::system_error& x) {
+      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Error while validating address: " << x.what();
+       return x.code();
+    }
+    catch (std::exception& x) {
+      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Error while validating address: " << x.what();
+      return make_error_code(CryptoNote::error::BAD_ADDRESS);
+    }
+
+    return std::error_code();
+  }
 } //namespace PaymentService

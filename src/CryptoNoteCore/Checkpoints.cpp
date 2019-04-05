@@ -130,14 +130,10 @@ namespace CryptoNote {
         logger(Logging::INFO) << "Failed to parse DNS checkpoint record: " << record;
         continue;
       }
-
-      if (!(0 == m_points.count(height))) {
-        logger(Logging::INFO) << "Checkpoint already exists for height: " << height << ". Ignoring DNS checkpoint.";
-      } else {
+      if (0 == m_points.count(height)) {
         add_checkpoint(height, hash_str);
       }
     }
-
     return true;
   }
 }

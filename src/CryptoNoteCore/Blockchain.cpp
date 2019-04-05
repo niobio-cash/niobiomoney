@@ -586,7 +586,7 @@ void Blockchain::rebuildCache() {
 bool Blockchain::storeCache() {
   std::lock_guard<decltype(m_blockchain_lock)> lk(m_blockchain_lock);
 
-  logger(INFO, BRIGHT_WHITE) << "Saving blockchain at height " << m_blocks.size() << ".";
+  logger(INFO, BRIGHT_WHITE) << "Saving blockchain at height " << m_blocks.size() - 1 << ".";
   BlockCacheSerializer ser(*this, getTailId(), logger.getLogger());
   if (!ser.save(appendPath(m_config_folder, m_currency.blocksCacheFileName()))) {
     logger(ERROR, BRIGHT_RED) << "Failed to save blockchain cache";
@@ -991,8 +991,6 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
     }
 
   }
-
-  size_t currentHeight = alt_chain.size() ? alt_chain.front()->second.height : bei.height;
 
   return m_currency.nextDifficulty(BlockMajorVersion, timestamps, commulative_difficulties);
 }

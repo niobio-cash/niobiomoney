@@ -42,6 +42,7 @@ public:
   bool restrictRPC(const bool is_resctricted);
   bool enableCors(const std::string domain);
   bool setFeeAddress(const std::string fee_address);
+  bool setFeePercent(const double_t fee_percent);
   bool setRpcBindToLoopback(const std::string ip);
   bool isTestnetOrRpcBindToLoopback();
 
@@ -101,6 +102,7 @@ private:
   bool k_on_transactions_by_payment_id(const K_COMMAND_RPC_GET_TRANSACTIONS_BY_PAYMENT_ID::request& req, K_COMMAND_RPC_GET_TRANSACTIONS_BY_PAYMENT_ID::response& res);
 
   bool f_getMixin(const Transaction& transaction, uint64_t& mixin);
+  bool on_validate_address(const COMMAND_RPC_VALIDATE_ADDRESS::request& req, COMMAND_RPC_VALIDATE_ADDRESS::response& res);
 
   Logging::LoggerRef logger;
   core& m_core;
@@ -109,6 +111,7 @@ private:
   bool m_restricted_rpc;
   std::string m_cors_domain;
   std::string m_fee_address;
+  double_t m_fee_percent;
   bool m_rpc_bind_to_loopback;
 };
 

@@ -387,4 +387,20 @@ struct EstimateFusion {
   };
 };
 
+struct ValidateAddress {
+	struct Request {
+		std::string address;
+
+		void serialize(CryptoNote::ISerializer& serializer);
+	};
+
+	struct Response {
+		bool isvalid;
+		std::string address;
+		std::string spendPublicKey;
+		std::string viewPublicKey;
+
+		void serialize(CryptoNote::ISerializer& serializer);
+	};
+};
 } //namespace PaymentService

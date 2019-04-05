@@ -856,7 +856,7 @@ void WalletGreen::changePassword(const std::string& oldPassword, const std::stri
     return;
   }
 
-  
+
   Crypto::chacha8_key newKey;
   generate_chacha8_key(newPassword, m_key);
 
@@ -3019,12 +3019,18 @@ IFusionManager::EstimateResult WalletGreen::estimate(uint64_t threshold, const s
   auto walletOuts = sourceAddresses.empty() ? pickWalletsWithMoney() : pickWallets(sourceAddresses);
   std::array<size_t, std::numeric_limits<uint64_t>::digits10 + 1> bucketSizes;
   bucketSizes.fill(0);
+  m_logger(INFO, BRIGHT_YELLOW) << "Initiating fusion estimate with threshold " << threshold;
+
   for (size_t walletIndex = 0; walletIndex < walletOuts.size(); ++walletIndex) {
+    m_logger(INFO, BRIGHT_YELLOW) << "Estimating for wallet index " << walletIndex;
     for (auto& out : walletOuts[walletIndex].outs) {
       uint8_t powerOfTen = 0;
       if (m_currency.isAmountApplicableInFusionTransactionInput(out.amount, threshold, powerOfTen)) {
         assert(powerOfTen < std::numeric_limits<uint64_t>::digits10 + 1);
         bucketSizes[powerOfTen]++;
+        m_logger(INFO, BRIGHT_YELLOW) << "Wallet index " << walletIndex << " amount " << out.amount << " applicable";
+      } else {
+        m_logger(INFO, BRIGHT_RED) << "Wallet index " << walletIndex << " amount " << out.amount << " not applicable";
       }
     }
 
@@ -3034,6 +3040,9 @@ IFusionManager::EstimateResult WalletGreen::estimate(uint64_t threshold, const s
   for (auto bucketSize : bucketSizes) {
     if (bucketSize >= m_currency.fusionTxMinInputCount()) {
       result.fusionReadyCount += bucketSize;
+      m_logger(INFO, BRIGHT_YELLOW) << "Bucket size passed minimum input count of " << m_currency.fusionTxMinInputCount() << " with size " << bucketSize;
+    } else {
+      m_logger(INFO, BRIGHT_RED) << "Bucket size did not passed minimum input count of " << m_currency.fusionTxMinInputCount() << " with size " << bucketSize;
     }
   }
 
