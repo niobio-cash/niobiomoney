@@ -1,5 +1,18 @@
 Release notes Niobio Cash
 
+v1.6.8
+- Reduce limits for fusion transactions
+- Implements NCIP 0004 for flexible Wallet Nodes
+-- NCIP0004: Extend feeaddress response to give fee percent back
+- Introduce "Validate Address" method for walletd and daemon.
+- Small fixes on pointers handling and stack
+
+v1.6.7
+- Protection against 51% attack
+- Change DAA to LWMA1 (LWMAAdjusted)
+- Load dns checkpoints before validating alternative blocks
+- Rollback chain when node missed upgrade
+
 v1.6.5
 - Burn vector attack protection
 
