@@ -272,7 +272,9 @@ namespace CryptoNote
     }
 
     m_threads.clear();
-    logger(INFO) << "We had " << m_threads.size() << " mining threads running. All finished." ;
+    if(m_threads.size() > 0) {
+      logger(INFO) << "We had " << m_threads.size() << " mining threads running. All finished." ;
+    }
     return true;
   }
   //-----------------------------------------------------------------------------------------------------
