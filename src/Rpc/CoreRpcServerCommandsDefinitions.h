@@ -1,5 +1,6 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2016, The Forknote developers
+// Copyright (c) 2019, The Niobio Cash developers
 //
 // This file is part of Bytecoin.
 //
@@ -329,12 +330,14 @@ struct COMMAND_RPC_GET_FEE_ADDRESS {
 
   struct response {
     std::string fee_address;
-    double_t fee_percent;
+    double fee_percent;
+    std::string wn_message;
 	  std::string status;
 
     void serialize(ISerializer &s) {
       KV_MEMBER(fee_address)
       KV_MEMBER(fee_percent)
+      KV_MEMBER(wn_message)
 	    KV_MEMBER(status)
     }
   };

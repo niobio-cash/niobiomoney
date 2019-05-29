@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2016, The Forknote developers
 // Copyright (c) 2016, The Karbowanec developers
-// Copyright (c) 2017, The Niobio developers
+// Copyright (c) 2017 - 2019, The Niobio Cash developers
 //
 // This file is part of Bytecoin.
 //
@@ -42,6 +42,7 @@ public:
   bool restrictRPC(const bool is_resctricted);
   bool enableCors(const std::string domain);
   bool setFeeAddress(const std::string fee_address);
+  bool setWnMessage(const std::string wn_message);
   bool setFeePercent(const double_t fee_percent);
   bool setRpcBindToLoopback(const std::string ip);
   bool isTestnetOrRpcBindToLoopback();
@@ -111,6 +112,7 @@ private:
   bool m_restricted_rpc;
   std::string m_cors_domain;
   std::string m_fee_address;
+  std::string m_wn_message;
   double_t m_fee_percent;
   bool m_rpc_bind_to_loopback;
 };

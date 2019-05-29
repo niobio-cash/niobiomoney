@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2016, The Forknote developers
 // Copyright (c) 2016, The Karbowanec developers
-// Copyright (c) 2017, The Niobio developers
+// Copyright (c) 2017 - 2019, The Niobio Cash developers
 //
 // This file is part of Bytecoin.
 //
@@ -206,6 +206,15 @@ bool RpcServer::enableCors(const std::string domain) {
 
 bool RpcServer::setFeeAddress(const std::string fee_address) {
   m_fee_address = fee_address;
+  return true;
+}
+
+bool RpcServer::setWnMessage(const std::string wn_message) {
+  if (wn_message.length() > 70) {
+    m_wn_message = wn_message.substr(0, 70) + "...";
+  } else {
+    m_wn_message = wn_message;
+  }
   return true;
 }
 
@@ -539,6 +548,11 @@ bool RpcServer::on_get_fee_address(const COMMAND_RPC_GET_FEE_ADDRESS::request& r
     res.fee_percent = m_fee_percent;
   } else {
     res.fee_percent = 0;
+  }
+  if(m_wn_message.empty()) {
+    res.wn_message = "No message or description provided.";
+  } else {
+    res.wn_message = m_wn_message;
   }
   res.status = CORE_RPC_STATUS_OK;
   return true;
