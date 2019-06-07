@@ -502,13 +502,13 @@ namespace CryptoNote
 
   bool NodeServer::run() {
     logger(INFO) << "Starting node_server";
-    logger(INFO, GREEN) << "#     #                                              #####";
-    logger(INFO, GREEN) << "##    #     #     ####   #####      #     ####      #     #    ##     ####   #    #";
-    logger(INFO, GREEN) << "# #   #     #    #    #  #    #     #    #    #     #         #  #   #       #    #";
-    logger(INFO, GREEN) << "#  #  #     #    #    #  #####      #    #    #     #        #    #   ####   ######";
-    logger(INFO, GREEN) << "#   # #     #    #    #  #    #     #    #    #     #        ######       #  #    #";
-    logger(INFO, GREEN) << "#    ##     #    #    #  #    #     #    #    #     #     #  #    #  #    #  #    #";
-    logger(INFO, GREEN) << "#     #     #     ####   #####      #     ####       #####   #    #   ####   #    #";
+    logger(INFO) << "#     #                                              #####";
+    logger(INFO) << "##    #     #     ####   #####      #     ####      #     #    ##     ####   #    #";
+    logger(INFO) << "# #   #     #    #    #  #    #     #    #    #     #         #  #   #       #    #";
+    logger(INFO) << "#  #  #     #    #    #  #####      #    #    #     #        #    #   ####   ######";
+    logger(INFO) << "#   # #     #    #    #  #    #     #    #    #     #        ######       #  #    #";
+    logger(INFO) << "#    ##     #    #    #  #    #     #    #    #     #     #  #    #  #    #  #    #";
+    logger(INFO) << "#     #     #     ####   #####      #     ####       #####   #    #   ####   #    #";
     m_workingContextGroup.spawn(std::bind(&NodeServer::acceptLoop, this));
     m_workingContextGroup.spawn(std::bind(&NodeServer::onIdle, this));
     m_workingContextGroup.spawn(std::bind(&NodeServer::timedSyncLoop, this));
