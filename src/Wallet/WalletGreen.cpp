@@ -972,6 +972,7 @@ std::string WalletGreen::doCreateAddress(const Crypto::PublicKey& spendPublicKey
   std::string address;
   try {
     address = addWallet(spendPublicKey, spendSecretKey, creationTimestamp);
+    /* REMOVED to avoid frequent resets
     auto currentTime = static_cast<uint64_t>(time(nullptr));
 
     if (creationTimestamp + m_currency.blockFutureTimeLimitV4() < currentTime) {
@@ -979,6 +980,7 @@ std::string WalletGreen::doCreateAddress(const Crypto::PublicKey& spendPublicKey
       shutdown();
       load(m_path, m_password);
     }
+    */
   } catch (const std::exception& e) {
     m_logger(ERROR, BRIGHT_RED) << "Failed to add wallet: " << e.what();
     startBlockchainSynchronizer();
@@ -3019,18 +3021,18 @@ IFusionManager::EstimateResult WalletGreen::estimate(uint64_t threshold, const s
   auto walletOuts = sourceAddresses.empty() ? pickWalletsWithMoney() : pickWallets(sourceAddresses);
   std::array<size_t, std::numeric_limits<uint64_t>::digits10 + 1> bucketSizes;
   bucketSizes.fill(0);
-  m_logger(INFO, BRIGHT_YELLOW) << "Initiating fusion estimate with threshold " << threshold;
+  m_logger(DEBUGGING, BRIGHT_YELLOW) << "Initiating fusion estimate with threshold " << threshold;
 
   for (size_t walletIndex = 0; walletIndex < walletOuts.size(); ++walletIndex) {
-    m_logger(INFO, BRIGHT_YELLOW) << "Estimating for wallet index " << walletIndex;
+    m_logger(DEBUGGING, BRIGHT_YELLOW) << "Estimating for wallet index " << walletIndex;
     for (auto& out : walletOuts[walletIndex].outs) {
       uint8_t powerOfTen = 0;
       if (m_currency.isAmountApplicableInFusionTransactionInput(out.amount, threshold, powerOfTen)) {
         assert(powerOfTen < std::numeric_limits<uint64_t>::digits10 + 1);
         bucketSizes[powerOfTen]++;
-        m_logger(INFO, BRIGHT_YELLOW) << "Wallet index " << walletIndex << " amount " << out.amount << " applicable";
+        m_logger(DEBUGGING, BRIGHT_YELLOW) << "Wallet index " << walletIndex << " amount " << out.amount << " applicable";
       } else {
-        m_logger(INFO, BRIGHT_RED) << "Wallet index " << walletIndex << " amount " << out.amount << " not applicable";
+        m_logger(DEBUGGING, BRIGHT_RED) << "Wallet index " << walletIndex << " amount " << out.amount << " not applicable";
       }
     }
 
@@ -3040,9 +3042,9 @@ IFusionManager::EstimateResult WalletGreen::estimate(uint64_t threshold, const s
   for (auto bucketSize : bucketSizes) {
     if (bucketSize >= m_currency.fusionTxMinInputCount()) {
       result.fusionReadyCount += bucketSize;
-      m_logger(INFO, BRIGHT_YELLOW) << "Bucket size passed minimum input count of " << m_currency.fusionTxMinInputCount() << " with size " << bucketSize;
+      m_logger(DEBUGGING, BRIGHT_YELLOW) << "Bucket size passed minimum input count of " << m_currency.fusionTxMinInputCount() << " with size " << bucketSize;
     } else {
-      m_logger(INFO, BRIGHT_RED) << "Bucket size did not passed minimum input count of " << m_currency.fusionTxMinInputCount() << " with size " << bucketSize;
+      m_logger(DEBUGGING, BRIGHT_RED) << "Bucket size did not passed minimum input count of " << m_currency.fusionTxMinInputCount() << " with size " << bucketSize;
     }
   }
 
