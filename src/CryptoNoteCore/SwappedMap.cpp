@@ -18,5 +18,5 @@
 #include "SwappedMap.h"
 
 namespace {
-  [[maybe_unused]] char suppressMSVCWarningLNK4221;
+  char suppressMSVCWarningLNK4221;
 }
