@@ -4,8 +4,8 @@
 IDI_ICON1    ICON    DISCARDABLE    "icons/wallet.ico"
 
 VS_VERSION_INFO VERSIONINFO
-  FILEVERSION APP_VER_MAJOR,APP_VER_MINOR,APP_VER_REV,APP_VER_BUILD
-  PRODUCTVERSION APP_VER_MAJOR,APP_VER_MINOR,APP_VER_REV,APP_VER_BUILD
+  FILEVERSION APP_VER_MAJOR,APP_VER_MINOR,APP_VER_REV
+  PRODUCTVERSION APP_VER_MAJOR,APP_VER_MINOR,APP_VER_REV
   FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
   FILEFLAGS VS_FF_DEBUG
@@ -20,13 +20,13 @@ VS_VERSION_INFO VERSIONINFO
     BEGIN
       BLOCK "000004b0"
       BEGIN
-        VALUE "CompanyName",      PROJECT_SITE
-        VALUE "FileDescription",  PROJECT_NAME " Walletd Optimizer " PROJECT_VERSION_LONG
-        VALUE "FileVersion",      PROJECT_VERSION_BUILD_NO
-        VALUE "LegalCopyright",   PROJECT_COPYRIGHT
-        VALUE "OriginalFilename", "optimizer.exe"
-        VALUE "ProductName",      PROJECT_NAME
-        VALUE "ProductVersion",   PROJECT_VERSION
+      VALUE "CompanyName",      PROJECT_SITE
+      VALUE "FileDescription",  PROJECT_NAME " Walletd Optimizer " PROJECT_VERSION
+      VALUE "FileVersion",      PROJECT_VERSION
+      VALUE "LegalCopyright",   PROJECT_COPYRIGHT
+      VALUE "OriginalFilename", "optimizer.exe"
+      VALUE "ProductName",      PROJECT_NAME
+      VALUE "ProductVersion",   PROJECT_VERSION
       END
     END
     BLOCK "VarFileInfo"
@@ -34,4 +34,3 @@ VS_VERSION_INFO VERSIONINFO
       VALUE "Translation", 0x0, 1200
     END
   END
-

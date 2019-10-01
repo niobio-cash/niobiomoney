@@ -1,5 +1,11 @@
 #define BUILD_COMMIT_ID "@VERSION@"
-#define PROJECT_VERSION "1.6.8"
+#define PROJECT_NAME "Niobio Cash"
+#define PROJECT_SITE "https://www.niobiocash.org"
+#define PROJECT_COPYRIGHT "Copyright 2017-2019, Niobio Cash"
+#define APP_VER_MAJOR 1
+#define APP_VER_MINOR 6
+#define APP_VER_REV 9
+#define PROJECT_VERSION "1.6.9"
 #define PROJECT_VERSION_BUILD_NO "001"
-#define RELEASE_NAME "Shai"
+#define RELEASE_NAME "Nekhbet"
 #define PROJECT_VERSION_LONG PROJECT_VERSION "-" RELEASE_NAME " (" BUILD_COMMIT_ID ")"
