@@ -688,7 +688,7 @@ bool core::update_miner_block_template() {
 
 bool core::on_idle() {
   if (!m_starter_message_showed) {
-    logger(INFO, CYAN) << "The daemon will start synchronizing with the network. It may take up to several hours.";
+    logger(INFO, CYAN) << "The node is synchronizing with the network. It may take up to several hours.";
     logger(INFO, CYAN) << "You can set the level of log details through \"set_log <level>\" command*, where <level> is between 0 (no details) and 4 (very verbose).";
     logger(INFO, CYAN) << "To quit the daemon use \"exit\" command. Type \"help\" to see the list of all available commands.";
     m_starter_message_showed = true;
