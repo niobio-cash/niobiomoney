@@ -1,5 +1,10 @@
 Release notes Niobio Cash
 
+v1.6.9
+- Introduces new tool for wallets' optimization on containers (walletd)
+-- https://wiki.niobiocash.money/walletd-json-rpc-api#optimization-tool-for-rpc-wallets
+- Fixes frequent resets for large containers
+
 v1.6.8
 - Reduce limits for fusion transactions
 - Implements NCIP 0004 for flexible Wallet Nodes
