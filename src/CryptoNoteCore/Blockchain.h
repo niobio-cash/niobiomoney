@@ -143,6 +143,7 @@ namespace CryptoNote {
             blocks.push_back(m_blocks[height].bl);
           }
         } catch (const std::exception& e) {
+          logger(Logging::ERROR) << "Exception caught: " << e.what();
           return false;
         }
       }

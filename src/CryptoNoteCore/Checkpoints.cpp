@@ -38,7 +38,7 @@ namespace CryptoNote {
   //---------------------------------------------------------------------------
   Checkpoints::Checkpoints(Logging::ILogger &log) : logger(log, "checkpoints") {}
   //---------------------------------------------------------------------------
-  bool Checkpoints::add_checkpoint(uint32_t height, const std::string &hash_str) {
+  bool Checkpoints::add_checkpoint(uint64_t height, const std::string &hash_str) {
     Crypto::Hash h = NULL_HASH;
     if (!Common::podFromHex(hash_str, h)) {
       logger(WARNING) << "Wrong hash in checkpoint for height " << height;
@@ -54,11 +54,11 @@ namespace CryptoNote {
     return true;
   }
   //---------------------------------------------------------------------------
-  bool Checkpoints::is_in_checkpoint_zone(uint32_t height) const {
+  bool Checkpoints::is_in_checkpoint_zone(uint64_t height) const {
     return !m_points.empty() && (height <= (--m_points.end())->first);
   }
   //---------------------------------------------------------------------------
-  bool Checkpoints::check_block(uint32_t height, const Crypto::Hash &h, bool &is_a_checkpoint) const {
+  bool Checkpoints::check_block(uint64_t height, const Crypto::Hash &h, bool &is_a_checkpoint) const {
     auto it = m_points.find(height);
     is_a_checkpoint = it != m_points.end();
     if (!is_a_checkpoint)
@@ -75,12 +75,12 @@ namespace CryptoNote {
     }
   }
   //---------------------------------------------------------------------------
-  bool Checkpoints::check_block(uint32_t  height, const Crypto::Hash &h) const {
+  bool Checkpoints::check_block(uint64_t  height, const Crypto::Hash &h) const {
     bool ignored;
     return check_block(height, h, ignored);
   }
   //---------------------------------------------------------------------------
-  bool Checkpoints::is_alternative_block_allowed(uint32_t  blockchain_height, uint32_t block_height) const {
+  bool Checkpoints::is_alternative_block_allowed(uint64_t blockchain_height, uint64_t block_height) const {
     if (0 == block_height) return false;
     if (block_height < blockchain_height - CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW && !is_in_checkpoint_zone(block_height)) {
       logger(Logging::ERROR, Logging::BRIGHT_WHITE) << "An attempt of too deep reorganization: " << blockchain_height - block_height << ", BLOCK REJECTED";
@@ -96,8 +96,8 @@ namespace CryptoNote {
     return checkpoint_height < block_height;
   }
 
-  std::vector<uint32_t> Checkpoints::getCheckpointHeights() const {
-    std::vector<uint32_t> checkpointHeights;
+  std::vector<uint64_t> Checkpoints::getCheckpointHeights() const {
+    std::vector<uint64_t> checkpointHeights;
     checkpointHeights.reserve(m_points.size());
     for (const auto& it : m_points) {
       checkpointHeights.push_back(it.first);
@@ -118,7 +118,7 @@ namespace CryptoNote {
     }
 
     for (const auto& record : records) {
-      uint32_t height;
+      uint64_t height;
       Crypto::Hash hash = NULL_HASH;
       std::stringstream ss;
       size_t del = record.find_first_of(':');

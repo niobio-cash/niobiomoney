@@ -194,13 +194,13 @@ private:
   size_t m_fusionTxMinInputCount;
   size_t m_fusionTxMinInOutCountRatio;
 
-  uint32_t m_upgradeHeightV2;
-  uint32_t m_upgradeHeightV3;
-  uint32_t m_upgradeHeightV4;
-  uint32_t m_upgradeHeightV5;
-  uint32_t m_upgradeHeightV6;
+  uint64_t m_upgradeHeightV2;
+  uint64_t m_upgradeHeightV3;
+  uint64_t m_upgradeHeightV4;
+  uint64_t m_upgradeHeightV5;
+  uint64_t m_upgradeHeightV6;
   unsigned int m_upgradeVotingThreshold;
-  uint32_t m_upgradeVotingWindow;
+  size_t m_upgradeVotingWindow;
   uint32_t m_upgradeWindow;
 
   std::string m_blocksFileName;

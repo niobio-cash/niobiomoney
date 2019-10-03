@@ -50,7 +50,7 @@ namespace CryptoNote {
       }
 
     bool init() {
-      uint32_t upgradeHeight = m_currency.upgradeHeight(m_targetVersion);
+      uint64_t upgradeHeight = m_currency.upgradeHeight(m_targetVersion);
       if (upgradeHeight == UNDEF_HEIGHT) {
         if (m_blockchain.empty()) {
           m_votingCompleteHeight = UNDEF_HEIGHT;
@@ -66,7 +66,7 @@ namespace CryptoNote {
             return false;
           }
 
-          uint32_t upgradeHeight = it - m_blockchain.begin();
+          uint64_t upgradeHeight = it - m_blockchain.begin();
           m_votingCompleteHeight = findVotingCompleteHeight(upgradeHeight);
           if (m_votingCompleteHeight == UNDEF_HEIGHT) {
             logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: voting complete height isn't found, upgrade height = " << upgradeHeight;
@@ -106,9 +106,9 @@ namespace CryptoNote {
     }
 
     uint8_t targetVersion() const { return m_targetVersion; }
-    uint32_t votingCompleteHeight() const { return m_votingCompleteHeight; }
+    uint64_t votingCompleteHeight() const { return m_votingCompleteHeight; }
 
-    uint32_t upgradeHeight() const {
+    uint64_t upgradeHeight() const {
       if (m_currency.upgradeHeight(m_targetVersion) == UNDEF_HEIGHT) {
         return m_votingCompleteHeight == UNDEF_HEIGHT ? UNDEF_HEIGHT : m_currency.calculateUpgradeHeight(m_votingCompleteHeight);
       } else {
@@ -153,7 +153,7 @@ namespace CryptoNote {
         }
 
       } else {
-        uint32_t lastBlockHeight = m_blockchain.size() - 1;
+        uint64_t lastBlockHeight = m_blockchain.size() - 1;
         if (isVotingComplete(lastBlockHeight)) {
           m_votingCompleteHeight = lastBlockHeight;
           logger(Logging::INFO, Logging::BRIGHT_GREEN) << "###### UPGRADE voting complete at block index " << m_votingCompleteHeight <<
@@ -175,7 +175,7 @@ namespace CryptoNote {
       }
     }
 
-    size_t getNumberOfVotes(uint32_t height) {
+    size_t getNumberOfVotes(uint64_t height) {
       if (height < m_currency.upgradeVotingWindow() - 1) {
         return 0;
       }
@@ -192,10 +192,10 @@ namespace CryptoNote {
     }
 
   private:
-    uint32_t findVotingCompleteHeight(uint32_t probableUpgradeHeight) {
+    uint64_t findVotingCompleteHeight(uint64_t probableUpgradeHeight) {
       assert(m_currency.upgradeHeight(m_targetVersion) == UNDEF_HEIGHT);
 
-      uint32_t probableVotingCompleteHeight = probableUpgradeHeight > m_currency.maxUpgradeDistance() ? probableUpgradeHeight - m_currency.maxUpgradeDistance() : 0;
+      uint64_t probableVotingCompleteHeight = probableUpgradeHeight > m_currency.maxUpgradeDistance() ? probableUpgradeHeight - m_currency.maxUpgradeDistance() : 0;
       for (size_t i = probableVotingCompleteHeight; i <= probableUpgradeHeight; ++i) {
         if (isVotingComplete(i)) {
           return i;
@@ -205,7 +205,7 @@ namespace CryptoNote {
       return UNDEF_HEIGHT;
     }
 
-    bool isVotingComplete(uint32_t height) {
+    bool isVotingComplete(uint64_t height) {
       assert(m_currency.upgradeHeight(m_targetVersion) == UNDEF_HEIGHT);
       assert(m_currency.upgradeVotingWindow() > 1);
       assert(m_currency.upgradeVotingThreshold() > 0 && m_currency.upgradeVotingThreshold() <= 100);
@@ -219,6 +219,6 @@ namespace CryptoNote {
     const Currency& m_currency;
     BC& m_blockchain;
     uint8_t m_targetVersion;
-    uint32_t m_votingCompleteHeight;
+    uint64_t m_votingCompleteHeight;
   };
 }
