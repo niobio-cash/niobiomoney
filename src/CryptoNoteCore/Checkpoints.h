@@ -1,4 +1,5 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018-2019, The Niobio Cash developers
 //
 // This file is part of Bytecoin.
 //
@@ -33,7 +34,7 @@ namespace CryptoNote
     bool check_block(uint64_t height, const Crypto::Hash& h) const;
     bool check_block(uint64_t height, const Crypto::Hash& h, bool& is_a_checkpoint) const;
     bool is_alternative_block_allowed(uint64_t blockchain_height, uint64_t block_height) const;
-    std::vector<uint32_t> getCheckpointHeights() const;
+    std::vector<uint64_t> getCheckpointHeights() const;
     bool load_checkpoints_from_dns();
   private:
     std::map<uint64_t, Crypto::Hash> m_points;

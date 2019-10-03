@@ -86,9 +86,9 @@ public:
   size_t fusionTxMinInputCount() const { return m_fusionTxMinInputCount; }
   size_t fusionTxMinInOutCountRatio() const { return m_fusionTxMinInOutCountRatio; }
 
-  uint32_t upgradeHeight(uint8_t majorVersion) const;
+  uint64_t upgradeHeight(uint8_t majorVersion) const;
   unsigned int upgradeVotingThreshold() const { return m_upgradeVotingThreshold; }
-  uint32_t upgradeVotingWindow() const { return m_upgradeVotingWindow; }
+  uint64_t upgradeVotingWindow() const { return m_upgradeVotingWindow; }
   uint32_t upgradeWindow() const { return m_upgradeWindow; }
   uint32_t minNumberVotingBlocks() const { return (m_upgradeVotingWindow * m_upgradeVotingThreshold + 99) / 100; }
   uint32_t maxUpgradeDistance() const { return 7 * m_upgradeWindow; }

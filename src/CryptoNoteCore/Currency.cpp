@@ -127,7 +127,7 @@ namespace CryptoNote {
 		}
 	}
 
-	uint32_t Currency::upgradeHeight(uint8_t majorVersion) const {
+	uint64_t Currency::upgradeHeight(uint8_t majorVersion) const {
 		if (majorVersion == BLOCK_MAJOR_VERSION_6) {
 			return m_upgradeHeightV6;
 		}
