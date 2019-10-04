@@ -2472,8 +2472,8 @@ bool Blockchain::validateInput(const MultisignatureInput& input, const Crypto::H
   return true;
 }
 
-bool Blockchain::checkCheckpoints(uint32_t& lastValidCheckpointHeight) {
-  std::vector<uint32_t> checkpointHeights = m_checkpoints.getCheckpointHeights();
+bool Blockchain::checkCheckpoints(uint64_t& lastValidCheckpointHeight) {
+  std::vector<uint64_t> checkpointHeights = m_checkpoints.getCheckpointHeights();
   for (const auto& checkpointHeight : checkpointHeights) {
     if (m_blocks.size() <= checkpointHeight) {
       return true;

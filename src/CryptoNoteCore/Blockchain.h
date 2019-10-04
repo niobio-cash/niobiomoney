@@ -323,7 +323,7 @@ namespace CryptoNote {
     void popTransaction(const Transaction& transaction, const Crypto::Hash& transactionHash);
     void popTransactions(const BlockEntry& block, const Crypto::Hash& minerTransactionHash);
     bool validateInput(const MultisignatureInput& input, const Crypto::Hash& transactionHash, const Crypto::Hash& transactionPrefixHash, const std::vector<Crypto::Signature>& transactionSignatures);
-    bool checkCheckpoints(uint32_t& lastValidCheckpointHeight);
+    bool checkCheckpoints(uint64_t& lastValidCheckpointHeight);
     void rollbackBlockchainTo(uint32_t height);
     void removeLastBlock();
     bool checkUpgradeHeight(const UpgradeDetector& upgradeDetector);
