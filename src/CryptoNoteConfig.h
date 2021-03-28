@@ -139,7 +139,12 @@ const char* const SEED_NODES[] = {
 	"198.245.50.69:8313",
 	"173.249.38.45:8313",
 	"80.241.215.133:8313",
-	"45.55.141.227:8313"
+	"45.55.141.227:8313",
+	"node0001.niobiocash.net:8313",
+	"node0002.niobiocash.net:8313",
+	"node0003.niobiocash.net:8313",
+	"node0004.niobiocash.net:8313",
+	"node0005.niobiocash.net:8313"
 };
 
 struct CheckpointData {
