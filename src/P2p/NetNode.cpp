@@ -1,5 +1,6 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers, The Karbowanec developers
 // Copyright (c) 2017, The Niobio developers
+// Copyright (c) 2017, The Quan developers
 //
 // This file is part of Bytecoin.
 //
@@ -502,13 +503,12 @@ namespace CryptoNote
 
   bool NodeServer::run() {
     logger(INFO) << "Starting node_server";
-    logger(INFO) << "#     #                                              #####";
-    logger(INFO) << "##    #     #     ####   #####      #     ####      #     #    ##     ####   #    #";
-    logger(INFO) << "# #   #     #    #    #  #    #     #    #    #     #         #  #   #       #    #";
-    logger(INFO) << "#  #  #     #    #    #  #####      #    #    #     #        #    #   ####   ######";
-    logger(INFO) << "#   # #     #    #    #  #    #     #    #    #     #        ######       #  #    #";
-    logger(INFO) << "#    ##     #    #    #  #    #     #    #    #     #     #  #    #  #    #  #    #";
-    logger(INFO) << "#     #     #     ####   #####      #     ####       #####   #    #   ####   #    #";
+    logger(INFO) << "   ____  ALIS VOLAT PROPRIIS";
+    logger(INFO) << "  / __ \\__  ______ _____  ";
+    logger(INFO) << " / / / / / / / __ `/ __ \\ ";
+    logger(INFO) << "/ /_/ / /_/ / /_/ / / / / ";
+    logger(INFO) << "\\___\\_\\__,_/\\__,_/_/ /_/  ";
+    logger(INFO) << "";
     m_workingContextGroup.spawn(std::bind(&NodeServer::acceptLoop, this));
     m_workingContextGroup.spawn(std::bind(&NodeServer::onIdle, this));
     m_workingContextGroup.spawn(std::bind(&NodeServer::timedSyncLoop, this));

@@ -63,7 +63,8 @@ getDevicesFromMiniSSDPD(const char * devtype, const char * socketpath)
 		return NULL;
 	}
 	addr.sun_family = AF_UNIX;
-	strncpy(addr.sun_path, socketpath, sizeof(addr.sun_path));
+	strncpy(addr.sun_path, socketpath, sizeof(addr.sun_path) - 1);
+	addr.sun_path[sizeof(addr.sun_path) - 1] = '\0';
 	/* TODO : check if we need to handle the EINTR */
 	if(connect(s, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) < 0)
 	{

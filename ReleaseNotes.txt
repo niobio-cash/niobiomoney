@@ -1,4 +1,7 @@
-Release notes Niobio Cash
+Release notes Quan
+
+v2.0.0
+- Rebrand Quan Project
 
 v1.6.9
 - Introduces new tool for wallets' optimization on containers (walletd)

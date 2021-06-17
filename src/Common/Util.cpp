@@ -320,7 +320,7 @@ std::string get_nix_version_display_string()
     config_folder =  (pathRet + "/" + CryptoNote::CRYPTONOTE_NAME);
 #else
     // Unix
-    config_folder = (pathRet + "/." + CryptoNote::CRYPTONOTE_NAME);
+    config_folder = (pathRet + "/" + CryptoNote::CRYPTONOTE_NAME);
 #endif
 #endif
 
@@ -332,11 +332,15 @@ std::string get_nix_version_display_string()
     namespace fs = boost::filesystem;
     boost::system::error_code ec;
     fs::path fs_path(path);
+    fs::path old_fs_path(getNiobioDataDirectory());
+    if (!fs::is_directory(fs_path, ec) && fs::is_directory(old_fs_path, ec)) {
+      fs::rename(old_fs_path, fs_path);
+    } 
     if (fs::is_directory(fs_path, ec)) {
       return true;
+    } else {
+      return fs::create_directories(fs_path, ec);
     }
-
-    return fs::create_directories(fs_path, ec);
   }
 
   std::error_code replace_file(const std::string& replacement_name, const std::string& replaced_name)
@@ -364,4 +368,35 @@ std::string get_nix_version_display_string()
     return boost::filesystem::is_directory(path, ec);
   }
 
-}
+    std::string getNiobioDataDirectory()
+    {
+      //namespace fs = boost::filesystem;
+      // Windows < Vista: C:\Documents and Settings\Username\Application Data\CRYPTONOTE_NAME
+      // Windows >= Vista: C:\Users\Username\AppData\Roaming\CRYPTONOTE_NAME
+      // Mac: ~/Library/Application Support/CRYPTONOTE_NAME
+      // Unix: ~/.CRYPTONOTE_NAME
+      std::string config_folder;
+  #ifdef WIN32
+      // Windows
+      config_folder = get_special_folder_path(CSIDL_APPDATA, true) + "/niobio";
+  #else
+      std::string pathRet;
+      char* pszHome = getenv("HOME");
+      if (pszHome == NULL || strlen(pszHome) == 0)
+        pathRet = "/";
+      else
+        pathRet = pszHome;
+  #ifdef MAC_OSX
+      // Mac
+      pathRet /= "Library/Application Support";
+      config_folder =  (pathRet + "/niobio");
+  #else
+      // Unix
+      config_folder = (pathRet + "/.niobio");
+  #endif
+  #endif
+
+      return config_folder;
+    }
+
+} // namespace

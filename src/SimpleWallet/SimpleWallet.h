@@ -2,6 +2,7 @@
 // Copyright (c) 2014-2016 XDN developers
 // Copyright (c) 2016-2017 The Karbowanec developers
 // Copyright (c) 2017, The Niobio developers
+// Copyright (c) 2017, The Quan developers
 //
 // This file is part of Bytecoin.
 //

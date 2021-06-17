@@ -1,12 +1,12 @@
 # English
 
-The Niobio Cash is the Brazilian national cryptocurrency, just like Bitcoin but more anonymous and privacy centric with opaque and more analysis resistant blockchain. It is people's electronic cash, not connected to government or officials.
+The Quan project is a blockchain experiment.
 
 ## Binaries
 
-You can download the binaries for Linux, MacOS, and Windows [HERE](https://github.com/niobio-cash/niobio-node-daemon/releases)
+You can download the binaries for Linux, MacOS, and Windows [HERE](https://github.com/)
 
-## Building Niobio 
+## Building Quan 
 
 ### On *nix and OSX
 
@@ -51,13 +51,13 @@ cmake -G "Visual Studio 12 Win64" ..
 ```
 
 # Português
-Niobio cash é uma criptomoeda brasileira, assim como o Bitcoin, mas mais anônima e centrada na privacidade, com resistência maior a análises da blockchain. É o dinheiro eletrônico das pessoas, não está ligado a governos.
+Quan é um projeto de blockchain de código aberto.
 
 ## Binários
 
-Você pode realizar o download dos Binários para Linux, MacOS, e Windows [AQUI](https://github.com/niobio-cash/niobio-node-daemon/releases)
+Você pode realizar o download dos Binários para Linux, MacOS, e Windows [AQUI](https://github.com/)
 
-## Compilando Niobio
+## Compilando Quan
 
 ### Em *nix e OSX
 
