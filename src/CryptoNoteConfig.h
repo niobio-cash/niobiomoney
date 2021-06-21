@@ -1,6 +1,5 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers, The Karbowanec developers
-// Copyright (c) 2017, The Niobio developers
-// Copyright (c) 2017, The Quan developers
+// Copyright (c) 2017, The Niobio Cash developers
 // Copyright (c) 2021, The Quan developers
 //
 // This file is part of Bytecoin.
@@ -21,6 +20,7 @@
 #pragma once
 
 #include <cstdint>
+#include <version.h>
 
 namespace CryptoNote {
 namespace parameters {
@@ -102,7 +102,7 @@ const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json"
 const char     TESTNET_FILENAME_PREFIX[]                     = "testnet_";
 } // parameters
 
-const char     CRYPTONOTE_NAME[]                             = "quan";
+const char     CRYPTONOTE_NAME[]                             = PROJECT_NAME;
 const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff00019dd085bedd03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101ad57d730d6e2419095871c3b5882daa96e0d30af050f7c97bfbe2433593224ee";
 
 const uint8_t  CURRENT_TRANSACTION_VERSION                   =  1;
