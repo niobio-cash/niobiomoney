@@ -1,0 +1,16 @@
+commit {
+    :up: rebrand
+}
+
+tag {
+    :+1: test
+}
+
+merge {
+    :art: test
+    > test
+}
+test {
+    :tada: test
+    |contruction| Working
+}
