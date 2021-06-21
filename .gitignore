@@ -8,3 +8,7 @@ Release
 Debug
 .vs
 launch.json
+
+
+#JetBrains IDEs CMake
+cmake-build-*/

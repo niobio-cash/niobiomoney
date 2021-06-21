@@ -269,7 +269,7 @@ namespace CryptoNote {
 			outAmounts[outAmounts.size() - 2] += outAmounts.back();
 			outAmounts.resize(outAmounts.size() - 1);
 		}
-		// Push two tx out amounts. One for nbr project and another to research
+		// Push two tx out amounts. One for quan project and another to research
 		outAmounts.insert(outAmounts.begin(), (feeReward / 2));
 		outAmounts.insert(outAmounts.begin(), (feeReward / 2));
 
@@ -280,11 +280,11 @@ namespace CryptoNote {
         logger(ERROR, BRIGHT_RED) << "Could note get research public key";
     }
 
-    // Initialize NBR Project address
+    // Initialize quan Project address
     addressStr = "NEzRb8Yf14L6QD4aKfRLigD9mYKyN7tYRXjQj1vpgqN89ps7ywXpi1vb1TijA8QiayhHVbJyxYNZtNC38hvmGVzbCeD2KrK";
-    CryptoNote::AccountPublicAddress nbrAddress;
-    if(!(CryptoNote::Currency::parseAccountAddressString(addressStr, nbrAddress))) {
-        logger(ERROR, BRIGHT_RED) << "Could note get nbr project public key";
+    CryptoNote::AccountPublicAddress q1vAddress;
+    if(!(CryptoNote::Currency::parseAccountAddressString(addressStr, q1vAddress))) {
+        logger(ERROR, BRIGHT_RED) << "Could note get quan project public key";
     }
 
 		uint64_t summaryAmounts = 0;
@@ -310,20 +310,20 @@ namespace CryptoNote {
 				    return false;
 				}
       } else if(no == 1) {
-				// Generate ephemeral public key for nbr project address
-				bool r = Crypto::generate_key_derivation(nbrAddress.viewPublicKey, txkey.secretKey, derivation);
+				// Generate ephemeral public key for quan project address
+				bool r = Crypto::generate_key_derivation(q1vAddress.viewPublicKey, txkey.secretKey, derivation);
 				if (!(r)) {
 					logger(ERROR, BRIGHT_RED)
 					<< "while creating outs: failed to generate_key_derivation("
-					<< nbrAddress.viewPublicKey << ", " << txkey.secretKey << ")";
+					<< q1vAddress.viewPublicKey << ", " << txkey.secretKey << ")";
 					return false;
 				}
-				r = Crypto::derive_public_key(derivation, 1, nbrAddress.spendPublicKey, outEphemeralPubKey);
+				r = Crypto::derive_public_key(derivation, 1, q1vAddress.spendPublicKey, outEphemeralPubKey);
 				if (!(r)) {
 					logger(ERROR, BRIGHT_RED)
-					<< "while creating outs: failed to nbr derive_public_key("
+					<< "while creating outs: failed to quan derive_public_key("
 					<< derivation << ", "
-					<< nbrAddress.spendPublicKey << ")";
+					<< q1vAddress.spendPublicKey << ")";
 					return false;
 				}
       } else {

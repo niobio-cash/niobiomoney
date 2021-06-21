@@ -489,7 +489,10 @@ bool processServerAliasResponse(const std::string& s, std::string& address) {
 
 		// Courtesy of Monero Project
 		// make sure the txt record has "oa1:krb" and find it
-		auto pos = s.find("oa1:nbr");
+        auto pos = s.find("oa1:q1v");
+        if(s.find("oa1:nbr")) pos = s.find("oa1:nbr");
+        std::string delimiter = ";";
+
 		if (pos == std::string::npos)
 			return false;
 		// search from there to find "recipient_address="
@@ -498,7 +501,7 @@ bool processServerAliasResponse(const std::string& s, std::string& address) {
 			return false;
 		pos += 18; // move past "recipient_address="
 		// find the next semicolon
-		auto pos2 = s.find(";", pos);
+		auto pos2 = s.find(delimiter, pos);
 		if (pos2 != std::string::npos)
 		{
 			// length of address == 95, we can at least validate that much here
