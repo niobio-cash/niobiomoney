@@ -47,7 +47,9 @@ namespace Crypto {
     uint8_t pwd_hash[HASH_SIZE];
 	cn_pow_hash_v1 kdf_hash;
 	kdf_hash.hash(data, size, pwd_hash);
-    memcpy(&key, &pwd_hash, sizeof(key));
+    //memcpy(&key, &pwd_hash, sizeof(key));
+    memcpy(static_cast<void*>(&key), &pwd_hash, sizeof(pwd_hash));
+
     memset(&pwd_hash, 0, sizeof(pwd_hash));
   }
   
