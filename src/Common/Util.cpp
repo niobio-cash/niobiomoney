@@ -325,8 +325,11 @@ namespace Tools {
     }
 
     std::string getRebrandDataDirectory() {
+        namespace fs = boost::filesystem;
+        boost::system::error_code ec;
         std::string config_folder = getDataDirectory("niobio");
-        if (config_folder.empty()) config_folder = getDataDirectory(".niobio");
+        fs::path fs_path(config_folder);
+        if ((config_folder.empty()) || (!fs::is_directory(fs_path, ec))) config_folder = getDataDirectory(".niobio");
         return config_folder;
     }
 
