@@ -17,6 +17,7 @@
 
 #include "P2pNode.h"
 
+#include <random>
 #include <boost/uuid/uuid_io.hpp>
 
 #include <System/ContextGroupTimeout.h>
@@ -238,7 +239,7 @@ void P2pNode::connectPeers() {
   // if white peer list is empty, get peers from seeds
   if (m_peerlist.get_white_peers_count() == 0 && !m_cfg.getSeedNodes().empty()) {
     auto seedNodes = m_cfg.getSeedNodes();
-    std::random_shuffle(seedNodes.begin(), seedNodes.end());
+    std::shuffle(seedNodes.begin(), seedNodes.end(), std::mt19937(std::random_device()()));
     for (const auto& seed : seedNodes) {
       auto conn = tryToConnectPeer(seed);
       if (conn != nullptr && fetchPeerList(std::move(conn))) {
@@ -296,10 +297,10 @@ bool P2pNode::makeNewConnectionFromPeerlist(const PeerlistManager::Peerlist& pee
     }
 
     logger(DEBUGGING) << "Selected peer: [" << peer.id << " " << peer.adr << "] last_seen: " <<
-      (peer.last_seen ? Common::timeIntervalToString(time(NULL) - peer.last_seen) : "never");
+      (peer.last_seen ? Common::timeIntervalToString(time(nullptr) - peer.last_seen) : "never");
 
     auto conn = tryToConnectPeer(peer.adr);
-    if (conn.get()) {
+    if (conn) {
       enqueueConnection(createProxy(std::move(conn)));
       return true;
     }

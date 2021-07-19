@@ -66,10 +66,10 @@ namespace CryptoNote {
             return false;
           }
 
-          uint64_t upgradeHeight = it - m_blockchain.begin();
-          m_votingCompleteHeight = findVotingCompleteHeight(upgradeHeight);
+          uint64_t probableUpgradeHeight = it - m_blockchain.begin();
+          m_votingCompleteHeight = findVotingCompleteHeight(probableUpgradeHeight);
           if (m_votingCompleteHeight == UNDEF_HEIGHT) {
-            logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: voting complete height isn't found, upgrade height = " << upgradeHeight;
+            logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: voting complete height isn't found, upgrade height = " << probableUpgradeHeight;
             return false;
           }
         } else {

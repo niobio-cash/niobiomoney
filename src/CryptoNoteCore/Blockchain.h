@@ -62,10 +62,10 @@ namespace CryptoNote {
     bool removeObserver(IBlockchainStorageObserver* observer);
 
     // ITransactionValidator
-    virtual bool checkTransactionInputs(const CryptoNote::Transaction& tx, BlockInfo& maxUsedBlock) override;
-    virtual bool checkTransactionInputs(const CryptoNote::Transaction& tx, BlockInfo& maxUsedBlock, BlockInfo& lastFailed) override;
-    virtual bool haveSpentKeyImages(const CryptoNote::Transaction& tx) override;
-    virtual bool checkTransactionSize(size_t blobSize) override;
+    bool checkTransactionInputs(const CryptoNote::Transaction& tx, BlockInfo& maxUsedBlock) override;
+    bool checkTransactionInputs(const CryptoNote::Transaction& tx, BlockInfo& maxUsedBlock, BlockInfo& lastFailed) override;
+    bool haveSpentKeyImages(const CryptoNote::Transaction& tx) override;
+    bool checkTransactionSize(size_t blobSize) override;
 
     bool init() { return init(Tools::getDefaultDataDirectory(), true); }
     bool init(const std::string& config_folder, bool load_existing);
@@ -84,7 +84,10 @@ namespace CryptoNote {
     bool getBlockByHash(const Crypto::Hash &h, Block &blk);
     bool getBlockHeight(const Crypto::Hash& blockId, uint32_t& blockHeight);
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
     template<class archive_t> void serialize(archive_t & ar, const unsigned int version);
+#pragma clang diagnostic pop
 
     bool haveTransaction(const Crypto::Hash &id);
     bool haveTransactionKeyImagesAsSpent(const Transaction &tx);
@@ -96,7 +99,10 @@ namespace CryptoNote {
     uint64_t getBlockTimestamp(uint32_t height);
     uint64_t getCoinsInCirculation();
     uint8_t getBlockMajorVersionForHeight(uint32_t height) const;
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
     uint8_t blockMajorVersion;
+#pragma clang diagnostic pop
     bool addNewBlock(const Block& bl_, block_verification_context& bvc);
     bool resetAndSetGenesisBlock(const Block& b);
     bool haveBlock(const Crypto::Hash& id);
@@ -111,7 +117,7 @@ namespace CryptoNote {
     bool getBackwardBlocksSize(size_t from_height, std::vector<size_t>& sz, size_t count);
     bool getTransactionOutputGlobalIndexes(const Crypto::Hash& tx_id, std::vector<uint32_t>& indexs);
     bool get_out_by_msig_gindex(uint64_t amount, uint64_t gindex, MultisignatureOutput& out);
-    bool checkTransactionInputs(const Transaction& tx, uint32_t& pmax_used_block_height, Crypto::Hash& max_used_block_id, BlockInfo* tail = 0);
+    bool checkTransactionInputs(const Transaction& tx, uint32_t& pmax_used_block_height, Crypto::Hash& max_used_block_id, BlockInfo* tail = 0); // NOLINT(modernize-use-nullptr)
     uint64_t getCurrentCumulativeBlocksizeLimit();
     uint64_t blockDifficulty(size_t i);
     bool getBlockContainingTransaction(const Crypto::Hash& txId, Crypto::Hash& blockId, uint32_t& blockHeight);
@@ -124,7 +130,7 @@ namespace CryptoNote {
     bool getTransactionIdsByPaymentId(const Crypto::Hash& paymentId, std::vector<Crypto::Hash>& transactionHashes);
     bool isBlockInMainChain(const Crypto::Hash& blockId);
 
-    template<class visitor_t> bool scanOutputKeysForIndexes(const KeyInput& tx_in_to_key, visitor_t& vis, uint32_t* pmax_related_block_height = NULL);
+    template<class visitor_t> bool scanOutputKeysForIndexes(const KeyInput& tx_in_to_key, visitor_t& vis, uint32_t* pmax_related_block_height = nullptr);
 
     bool addMessageQueue(MessageQueue<BlockchainMessage>& messageQueue);
     bool removeMessageQueue(MessageQueue<BlockchainMessage>& messageQueue);
@@ -139,8 +145,8 @@ namespace CryptoNote {
           if (!m_blockIndex.getBlockHeight(bl_id, height)) {
             missed_bs.push_back(bl_id);
           } else {
-            if (!(height < m_blocks.size())) { logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: bl_id=" << Common::podToHex(bl_id)
-            << " have index record with offset=" << height << ", bigger then m_blocks.size()=" << m_blocks.size(); return false; }
+            if (height >= m_blocks.size()) { logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: bl_id=" << Common::podToHex(bl_id)
+                                                                                         << " have index record with offset=" << height << ", bigger then m_blocks.size()=" << m_blocks.size(); return false; }
             blocks.push_back(m_blocks[height].bl);
           }
         } catch (const std::exception& e) {
@@ -309,9 +315,9 @@ namespace CryptoNote {
     std::vector<Crypto::Hash> doBuildSparseChain(const Crypto::Hash& startBlockId) const;
     bool getBlockCumulativeSize(const Block& block, size_t& cumulativeSize);
     bool update_next_comulative_size_limit();
-    bool check_tx_input(const KeyInput& txin, const Crypto::Hash& tx_prefix_hash, const std::vector<Crypto::Signature>& sig, uint32_t* pmax_related_block_height = NULL);
-    bool checkTransactionInputs(const Transaction& tx, const Crypto::Hash& tx_prefix_hash, uint32_t* pmax_used_block_height = NULL);
-    bool checkTransactionInputs(const Transaction& tx, uint32_t* pmax_used_block_height = NULL);
+    bool check_tx_input(const KeyInput& txin, const Crypto::Hash& tx_prefix_hash, const std::vector<Crypto::Signature>& sig, uint32_t* pmax_related_block_height = nullptr);
+    bool checkTransactionInputs(const Transaction& tx, const Crypto::Hash& tx_prefix_hash, uint32_t* pmax_used_block_height = nullptr);
+    bool checkTransactionInputs(const Transaction& tx, uint32_t* pmax_used_block_height = nullptr);
     bool have_tx_keyimg_as_spent(const Crypto::KeyImage &key_im);
     const TransactionEntry& transactionByIndex(TransactionIndex index);
     bool pushBlock(const Block& blockData, block_verification_context& bvc);
@@ -343,8 +349,7 @@ namespace CryptoNote {
   class LockedBlockchainStorage: boost::noncopyable {
   public:
 
-    LockedBlockchainStorage(Blockchain& bc)
-      : m_bc(bc), m_lock(bc.m_blockchain_lock) {}
+    explicit LockedBlockchainStorage(Blockchain& bc) : m_bc(bc), m_lock(bc.m_blockchain_lock) {}
 
     Blockchain* operator -> () {
       return &m_bc;
@@ -353,13 +358,16 @@ namespace CryptoNote {
   private:
 
     Blockchain& m_bc;
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
     std::lock_guard<std::recursive_mutex> m_lock;
+#pragma clang diagnostic pop
   };
 
   template<class visitor_t> bool Blockchain::scanOutputKeysForIndexes(const KeyInput& tx_in_to_key, visitor_t& vis, uint32_t* pmax_related_block_height) {
     std::lock_guard<std::recursive_mutex> lk(m_blockchain_lock);
     auto it = m_outputs.find(tx_in_to_key.amount);
-    if (it == m_outputs.end() || !tx_in_to_key.outputIndexes.size())
+    if (it == m_outputs.end() || !tx_in_to_key.outputIndexes.size()) // NOLINT(readability-container-size-empty)
       return false;
 
     std::vector<uint32_t> absolute_offsets = relative_output_offsets_to_absolute(tx_in_to_key.outputIndexes);
@@ -376,7 +384,7 @@ namespace CryptoNote {
 
       const TransactionEntry& tx = transactionByIndex(amount_outs_vec[i].first);
 
-      if (!(amount_outs_vec[i].second < tx.tx.outputs.size())) {
+      if (amount_outs_vec[i].second >= tx.tx.outputs.size()) {
         logger(Logging::ERROR, Logging::BRIGHT_RED)
             << "Wrong index in transaction outputs: "
             << amount_outs_vec[i].second << ", expected less then "
