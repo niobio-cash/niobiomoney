@@ -17,10 +17,10 @@
 
 #include "PeerListManager.h"
 
-#include <time.h>
-#include <boost/foreach.hpp>
+#include <ctime>
+//#include <boost/foreach.hpp>
 #include <System/Ipv4Address.h>
-
+#include <reverse_iterate.h>
 #include "Serialization/SerializationOverloads.h"
 
 using namespace CryptoNote;
@@ -159,13 +159,13 @@ bool PeerlistManager::get_peerlist_head(std::list<PeerlistEntry>& bs_head, uint3
   const peers_indexed::index<by_time>::type& by_time_index = m_peers_white.get<by_time>();
   uint32_t cnt = 0;
 
-  BOOST_REVERSE_FOREACH(const peers_indexed::value_type& vl, by_time_index)
-  {
+  //BOOST_REVERSE_FOREACH(const peers_indexed::value_type& vl, by_time_index) {
+  for(const peers_indexed::value_type& vl: reverse_iterate(by_time_index)) {
+      if (cnt++ > depth)
+          break;
     if (!vl.last_seen)
       continue;
     bs_head.push_back(vl);
-    if (cnt++ > depth)
-      break;
   }
   return true;
 }

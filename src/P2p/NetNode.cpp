@@ -419,11 +419,11 @@ namespace CryptoNote
     std::string host = addr.substr(0, pos);
 
     try {
-      uint32_t port = Common::fromString<uint32_t>(addr.substr(pos + 1));
+      auto port = Common::fromString<uint32_t>(addr.substr(pos + 1));
 
       System::Ipv4Resolver resolver(m_dispatcher);
-      auto addr = resolver.resolve(host);
-      nodes.push_back(NetworkAddress{hostToNetwork(addr.getValue()), port});
+      auto addr_ = resolver.resolve(host);
+      nodes.push_back(NetworkAddress{hostToNetwork(addr_.getValue()), port});
 
       logger(TRACE) << "Added seed node: " << nodes.back() << " (" << host << ")";
 
@@ -937,10 +937,10 @@ namespace CryptoNote
     time(&now);
     delta = now - local_time;
 
-    BOOST_FOREACH(PeerlistEntry& be, local_peerlist)
-    {
-      if(be.last_seen > uint64_t(local_time))
-      {
+    //BOOST_FOREACH(PeerlistEntry& be, local_peerlist) {
+      //if(be.last_seen > uint64_t(local_time)) {
+      for (PeerlistEntry& be : local_peerlist) {
+          if (be.last_seen > uint64_t(local_time)) {
         logger(ERROR) << "FOUND FUTURE peerlist for entry " << be.adr << " last_seen: " << be.last_seen << ", local_time(on remote node):" << local_time;
         return false;
       }
@@ -1140,7 +1140,18 @@ namespace CryptoNote
 
     //fill response
     rsp.local_time = time(NULL);
-    m_peerlist.get_peerlist_head(rsp.local_peerlist);
+    //m_peerlist.get_peerlist_head(rsp.local_peerlist);
+      std::list<PeerlistEntry> local_peerlist_new;
+      m_peerlist.get_peerlist_head(local_peerlist_new);
+      //only include out peers we did not already send
+      rsp.local_peerlist.resize(local_peerlist_new.size());
+      for (auto &pe : local_peerlist_new)
+      {
+          if (!context.sent_addresses.insert(pe.adr).second)
+              continue;
+          rsp.local_peerlist.push_back(pe);
+      }
+    //
     m_payload_handler.get_payload_sync_data(rsp.payload_data);
     logger(Logging::TRACE) << context << "COMMAND_TIMED_SYNC";
     return 1;
@@ -1196,6 +1207,10 @@ namespace CryptoNote
 
     //fill response
     m_peerlist.get_peerlist_head(rsp.local_peerlist);
+    //
+      for (const auto &e : rsp.local_peerlist)
+          context.sent_addresses.insert(e.adr);
+    //
     get_local_node_data(rsp.node_data);
     m_payload_handler.get_payload_sync_data(rsp.payload_data);
 

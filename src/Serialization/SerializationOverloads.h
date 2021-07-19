@@ -40,13 +40,9 @@ serializeAsBinary(std::vector<T>& value, Common::StringView name, CryptoNote::IS
   if (serializer.type() == ISerializer::INPUT) {
     serializer.binary(blob, name);
     value.resize(blob.size() / sizeof(T));
-    if (blob.size()) {
-      memcpy(&value[0], blob.data(), blob.size());
-    }
+      if (!blob.empty()) memcpy(&value[0], blob.data(), blob.size());
   } else {
-    if (!value.empty()) {
-      blob.assign(reinterpret_cast<const char*>(&value[0]), value.size() * sizeof(T));
-    }
+      if (!value.empty()) blob.assign(reinterpret_cast<const char *>(&value[0]), value.size() * sizeof(T));
     serializer.binary(blob, name);
   }
 }
@@ -81,9 +77,7 @@ template <typename Cont>
 bool serializeContainer(Cont& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
   size_t size = value.size();
   if (!serializer.beginArray(size, name)) {
-    if (serializer.type() == ISerializer::INPUT) {
-      value.clear();
-    }
+      if (serializer.type() == ISerializer::INPUT) value.clear();
 
     return false;
   }
@@ -131,9 +125,7 @@ bool serializeMap(MapT& value, Common::StringView name, CryptoNote::ISerializer&
   size_t size = value.size();
 
   if (!serializer.beginArray(size, name)) {
-    if (serializer.type() == ISerializer::INPUT) {
-      value.clear();
-    }
+      if (serializer.type() == ISerializer::INPUT) value.clear();
 
     return false;
   }

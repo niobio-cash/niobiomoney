@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 project (miniupnpc C)
 set (MINIUPNPC_VERSION 1.9)
